@@ -34,8 +34,11 @@ enum MeshPoints {
     static let defaultAmplitude: Double = 0.09
 
     /// Multiplies every point frequency. The distance knob is `amplitude`;
-    /// this is the pace knob.
-    static let speed: Double = 3.0
+    /// this is the pace knob for the local churn, as `MeshDrift`'s periods are
+    /// for the sweep. Both were slowed by half again together, so the churn
+    /// stays in proportion to the sweep rather than becoming the busier of the
+    /// two.
+    static let speed: Double = 2.0
 
     /// A second harmonic is added to each axis at this fraction of the base
     /// frequency. A single sine traces the same straight line forever, which

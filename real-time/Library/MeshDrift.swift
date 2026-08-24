@@ -16,11 +16,15 @@ enum MeshDrift {
     /// leaves a hard border. At 1.9 that ceiling is 0.45.
     static let travel: Double = 0.40
 
-    /// Radians per second, detuned so the two axes never resynchronise. Slow
-    /// on purpose: a sweep takes roughly 80 and 110 seconds, which reads as
-    /// drifting rather than sliding.
-    private static let frequencyX: Double = 0.079
-    private static let frequencyY: Double = 0.057
+    /// Seconds for one full sweep on each axis — the pace knob. Stated as
+    /// periods rather than radians per second so it can be retuned by eye:
+    /// raise both to slow the drift, keeping them detuned by a similar ratio
+    /// so the axes never resynchronise into a straight diagonal.
+    private static let periodX: Double = 120
+    private static let periodY: Double = 165
+
+    private static let frequencyX = 2 * Double.pi / periodX
+    private static let frequencyY = 2 * Double.pi / periodY
 
     /// Offsets the vertical sweep so the mesh traces a wandering path rather
     /// than a diagonal line.

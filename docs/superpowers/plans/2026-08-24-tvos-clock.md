@@ -1435,6 +1435,23 @@ spanning the whole top band, and the dark stop from a centre-left band to the
 right side — with all four stops present throughout.
 
 
+**Later revision — the drift was slowed by half again.**
+
+`MeshDrift`'s frequencies are now expressed as **periods in seconds** rather
+than radians per second, so the pace can be retuned by eye without doing the
+2*pi arithmetic. 120s horizontal and 165s vertical, up from roughly 80s and
+110s. The detuning ratio was kept close to the original so the two axes still
+never resynchronise into a straight diagonal.
+
+`MeshPoints.speed` went 3.0 to 2.0 at the same time, so the local churn stays in
+proportion to the sweep instead of becoming the busier of the two.
+
+Verified on frames 31 seconds apart with Electric rainbow: the mint stop
+retreated to a sliver at the top-left, yellow crossed the top, and the dark stop
+grew into a large blob on the right — clearly still travelling, but evolving
+rather than sweeping.
+
+
 ---
 
 ## Plan Self-Review
