@@ -1291,6 +1291,22 @@ white on all 34 other themes, since every one of them ships a white foreground.
 Left as specified pending a decision.
 
 
+**Later revision — vivid palettes merged into their mood sections.**
+
+The four `Vivid *` sections were folded into the mood they belong to, so the
+list is five sections again: Basics (2), Night (9), Happiness (9), Calm (6),
+Storm (9) — 35 themes, none lost. Within a section the muted palettes come
+first and the vivid ones follow, so each section reads quiet to loud.
+
+Theme IDs were unchanged by the merge, so no persisted selection was
+invalidated. Verified: 35 ids, all unique.
+
+`Deep-sea bioluminescence` renamed to `Deep sea`. Its id stays `deep-sea`, so
+this is a display-only change and nothing persisted needs migrating. The
+one-line caption clamp added for the old long name is kept — it protects any
+future long name, not just that one.
+
+
 ---
 
 ## Plan Self-Review

@@ -11,9 +11,9 @@ struct ThemeTileCaption: View {
                 Image(systemName: "checkmark.circle.fill")
             }
             Text(name)
-                // A long name like "Deep-sea bioluminescence" would otherwise
-                // wrap to two lines and make its tile taller than the others
-                // in the row. Shrinking to fit keeps every row level.
+                // A long name would otherwise wrap to two lines and make its
+                // tile taller than the others in the row. Shrinking to fit
+                // keeps every row level whatever a theme is called.
                 .lineLimit(1)
                 .minimumScaleFactor(Metrics.ThemeTile.captionMinimumScale)
         }
