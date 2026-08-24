@@ -7,9 +7,7 @@ enum ForegroundStyle: Hashable, Sendable {
     /// Liquid glass: the background shows through the glyphs.
     /// How that is achieved is private to `GlassClockText`.
     case glass
-}
 
-extension ForegroundStyle {
     /// The color for text that is not the time itself.
     ///
     /// Glass has no color of its own to borrow, so it falls back to white —

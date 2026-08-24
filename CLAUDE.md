@@ -25,6 +25,23 @@ Exactly one top-level `struct`, `class`, or `enum` per file, and the filename
 matches it. A nested type used only by its parent (a private `Keys` enum, for
 example) may stay inside the parent — a nested type is not a top-level type.
 
+## Extensions
+
+An extension of an existing type lives in `Library/Extensions/`, in a file
+named `[Type]+Extensions.swift` — `Color+Extensions.swift`,
+`View+Extensions.swift`, `Comparable+Extensions.swift`. One file per extended
+type, however many members it holds: the folder is browsable by the type being
+extended, not by whichever feature happened to need it.
+
+Two cases deliberately stay put:
+
+- Members of a type belong **in** that type, not in a same-file extension
+  after it. If you are reaching for `extension Foo` inside `Foo.swift`, put the
+  member in `Foo` instead.
+- A `ViewModifier` and the `extension View` that exposes it stay together in
+  the modifier's own file, so the modifier can remain `private`. Splitting them
+  would force it to internal for no gain.
+
 ## No magic numbers
 
 No numeric literal appears inline in a view or model. Every one is a named
