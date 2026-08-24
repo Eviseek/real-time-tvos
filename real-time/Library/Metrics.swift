@@ -48,6 +48,10 @@ enum Metrics {
 
         /// Gap between the checkmark and the theme name.
         static let captionItemSpacing: CGFloat = 8
+
+        /// Space beneath the theme name, so it is not crowded against the
+        /// bottom edge of the focus card the tile sits inside.
+        static let captionBottomPadding: CGFloat = 16
     }
 
     /// Grids inside the full-screen settings covers.
@@ -74,21 +78,32 @@ enum Metrics {
         static let zoneRowPadding: CGFloat = 8
     }
 
-    /// The auto-hiding settings bar.
+    /// The always-visible settings bar.
+    ///
+    /// Deliberately small: it sits on screen permanently over a clock meant to
+    /// be looked at, so it reads as a thin strip of chrome rather than a
+    /// toolbar competing with the time.
     enum Overlay {
-        /// Gap between the bar's buttons.
-        static let buttonSpacing: CGFloat = 32
+        /// Size of the icon-only Theme and Timezone glyphs. Large enough to
+        /// identify across a room, small enough to keep the bar a strip.
+        static let iconSize: CGFloat = 30
+
+        /// The animation control keeps its text, because its whole purpose is
+        /// telling you which state you are in — an icon cannot do that.
+        static let labelFontSize: CGFloat = 24
+
+        /// Gap between the bar's controls. Tight, since tvOS already draws a
+        /// focus ring around whichever one is selected.
+        static let buttonSpacing: CGFloat = 12
 
         /// Horizontal inset inside the capsule.
-        static let horizontalPadding: CGFloat = 48
+        static let horizontalPadding: CGFloat = 20
 
-        /// Vertical inset inside the capsule.
-        static let verticalPadding: CGFloat = 24
+        /// Vertical inset inside the capsule. Small — this is what makes the
+        /// bar short rather than tall.
+        static let verticalPadding: CGFloat = 10
 
         /// Drop from the top of the screen, clear of tvOS overscan.
-        static let topPadding: CGFloat = 40
-
-        /// Gap between the animation button and its explanatory caption.
-        static let captionSpacing: CGFloat = 4
+        static let topPadding: CGFloat = 32
     }
 }

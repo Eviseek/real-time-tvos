@@ -1,18 +1,24 @@
 import SwiftUI
 
-/// The always-visible control bar. Owns only which sheet is up.
+/// The always-visible control bar: icons for the two screens, text for the one
+/// control whose state you need to read at a glance.
 struct SettingsOverlay: View {
-    @State private var showingThemes = false
-    @State private var showingTimeZones = false
-
     var body: some View {
         VStack {
             // One container so the bar refracts as a single piece of glass
             // rather than as three unrelated slabs.
             GlassEffectContainer {
                 HStack(spacing: Metrics.Overlay.buttonSpacing) {
-                    Button("Theme") { showingThemes = true }
-                    Button("Timezone") { showingTimeZones = true }
+                    NavigationLink {
+                        ThemeGrid()
+                    } label: {
+                        SettingsBarIcon(title: "Theme", systemImage: "paintpalette")
+                    }
+                    NavigationLink {
+                        TimeZonePicker()
+                    } label: {
+                        SettingsBarIcon(title: "Timezone", systemImage: "globe")
+                    }
                     AnimationToggleButton()
                 }
                 .padding(.horizontal, Metrics.Overlay.horizontalPadding)
@@ -23,7 +29,5 @@ struct SettingsOverlay: View {
 
             Spacer()
         }
-        .fullScreenCover(isPresented: $showingThemes) { ThemeGrid() }
-        .fullScreenCover(isPresented: $showingTimeZones) { TimeZonePicker() }
     }
 }

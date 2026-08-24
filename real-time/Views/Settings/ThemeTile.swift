@@ -17,6 +17,7 @@ struct ThemeTile: View {
             .frame(height: Metrics.ThemeTile.previewHeight)
 
             ThemeTileCaption(name: theme.name, isSelected: isSelected)
+                .padding(.bottom, Metrics.ThemeTile.captionBottomPadding)
         }
     }
 }

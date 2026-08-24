@@ -25,11 +25,21 @@ enum MeshPoints {
 
     /// How far a point may drift from its base position, in unit-square terms.
     ///
-    /// 0.08 is roughly 8% of the screen: enough that the gradient visibly
-    /// moves, small enough that no color region crosses another and flips the
-    /// mesh inside out. An edge point starts at 0.5, so this also keeps it
-    /// clear of the corners it shares an edge with.
-    static let defaultAmplitude: Double = 0.08
+    /// 0.18 is roughly 18% of the screen. This is the **distance** knob: raise
+    /// it for wider sweeps, lower it for a subtler drift. It is safe to raise
+    /// well past this without opening gaps at the screen edge, because
+    /// `freedom` pins the boundary — an edge point starting at 0.5 would have
+    /// to travel 0.5 to reach a corner.
+    static let defaultAmplitude: Double = 0.18
+
+    /// Multiplies every frequency below. This is the **speed** knob: 1.0 gives
+    /// the original 18-37 second periods, which read as nearly static on a
+    /// clock face. At 5.0 the points cycle every 4-7 seconds, so the gradient
+    /// is plainly in motion without becoming restless.
+    ///
+    /// Scaling the table rather than editing each entry keeps the frequencies
+    /// mutually detuned, which is what stops the motion looking mechanical.
+    static let speed: Double = 5.0
 
     /// Which axes each control point may travel on: `1` is free, `0` is pinned.
     ///
@@ -44,7 +54,7 @@ enum MeshPoints {
         SIMD2(0, 0), SIMD2(1, 0), SIMD2(0, 0),
     ]
 
-    /// Per-point horizontal frequency, in radians per second.
+    /// Per-point horizontal frequency, in radians per second before `speed`.
     ///
     /// Detuned deliberately: shared frequencies drift in lockstep and read as
     /// mechanical, while these values never visibly repeat. Entries for axes
@@ -65,9 +75,10 @@ enum MeshPoints {
 
     static func points(at time: Double, amplitude: Double = defaultAmplitude) -> [SIMD2<Float>] {
         base.indices.map { index in
+            let elapsed = time * speed
             let travel = SIMD2(
-                sin(time * frequencyX[index] + phase[index]),
-                cos(time * frequencyY[index] + phase[index])
+                sin(elapsed * frequencyX[index] + phase[index]),
+                cos(elapsed * frequencyY[index] + phase[index])
             ) * amplitude * freedom[index]
             let moved = base[index] + travel
             return SIMD2(

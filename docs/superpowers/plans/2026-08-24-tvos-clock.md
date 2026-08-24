@@ -1139,6 +1139,31 @@ git add real-time/Support/IdleTimerModifier.swift real-time/Clock/ClockScreen.sw
 git commit -m "feat: prevent tvOS screensaver while the clock is visible"
 ```
 
+**Later revisions — compact icon bar, pushed navigation, faster motion.**
+
+Requested after the always-visible change:
+
+- The bar is now icon-only for Theme (`paintpalette`) and Timezone (`globe`),
+  via `Label` + `.labelStyle(.iconOnly)` so the text survives as the
+  accessibility label. Only the animation control keeps visible text, because
+  its label is the state readout. `Metrics.Overlay` shrank accordingly
+  (paddings 48/24 to 20/10, spacing 32 to 12).
+- The "Solid themes have nothing to flow" caption was **removed**. Written for
+  a bar that appeared for five seconds, it became the largest element in a bar
+  that is now permanent and deliberately small. `Metrics.Overlay.captionSpacing`
+  was deleted with it. The disabled appearance carries the meaning alone.
+- `ThemeGrid` and `TimeZonePicker` are now **pushed** in a `NavigationStack`
+  rather than presented with `.fullScreenCover`, so they are their own screens
+  instead of covers layered over the clock. Their `@Environment(\.dismiss)`
+  calls needed no change — `dismiss()` pops a push just as it dismisses a
+  cover. `SettingsOverlay` lost both `@State` flags in the process.
+- `MeshPoints` gained a `speed` multiplier (5.0) and its amplitude went 0.08 to
+  0.18. At the original values each point cycled every 18-37 seconds, which
+  read as nearly static; now it is 4-7 seconds. Amplitude is safe to raise
+  because `freedom` pins the boundary, so no value opens a gap at the screen
+  edge. These two constants are the speed and distance knobs.
+
+
 ---
 
 ## Plan Self-Review
