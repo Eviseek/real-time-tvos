@@ -730,6 +730,31 @@ git add real-time/Foreground/GlassClockText.swift real-time/Clock/ClockFace.swif
 git commit -m "feat: add liquid-glass clock glyphs with reduce-transparency fallback"
 ```
 
+**Outcome — Strategy A (masked glass layer) was used.**
+
+Screenshot: `/private/tmp/.../scratchpad/glass-strategy-a-a.png`, taken on
+Aurora with the mesh animating.
+
+Strategies B (`.foregroundStyle(.ultraThinMaterial)`) and C (white at 0.35
+opacity with `.blendMode(.overlay)`) were never reached: A passed on its first
+build, and the plan says to stop at the first strategy that passes.
+
+What A produces: the glyph interiors show the mesh directly — the digits over
+the green region read teal, the ones over the violet region read purple, and
+the colors travel through the glyphs as the mesh moves. Not flat white, not
+invisible, not a solid slab of glass.
+
+The one reservation, reported rather than asserted away: contrast is low. The
+glyphs are legible but faint, and that is inherent to `.clear` glass over a
+mid-tone gradient. If it reads as too faint on a real panel, the knobs are
+`.glassEffect(.regular, …)` instead of `.clear`, or a soft drop shadow behind
+the mask.
+
+The implementation was split into `GlassClockText` (which chooses between glass
+and the Reduce Transparency fallback) and `GlassGlyphLayer` (which does the
+masking), to stay inside the project's 30-line view limit.
+
+
 ---
 
 ### Task 7: Auto-hiding settings overlay and theme grid
