@@ -11,9 +11,14 @@ Four top-level folders under `real-time/`. Nothing lives outside them except
 | Folder | Holds |
 |---|---|
 | `Library/` | Pure logic and reusable plumbing with no domain meaning: geometry, constants, view modifiers |
-| `Models/` | Domain types, the theme catalog, the settings store, and their protocols |
+| `Models/` | Domain types and their protocols, grouped in subfolders by domain (`Theme/`, `TimeZone/`, `Settings/`) |
 | `Views/` | SwiftUI views only, grouped in subfolders by screen area (`Clock/`, `Background/`, `Foreground/`, `Settings/`) |
 | `Resources/` | Asset catalogs, Info.plist entries, localization |
+
+A model subfolder holds one domain: its types, its catalog, and the protocol
+those are consumed through. A type that only exists as part of another —
+`BackgroundStyle` and `ForegroundStyle` are two halves of a `Theme` — belongs
+in that domain's folder, not in one of its own.
 
 The project uses a file-system synchronized group: any `.swift` file created
 under `real-time/` joins the target automatically. **Never hand-edit
