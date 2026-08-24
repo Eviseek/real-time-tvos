@@ -2,11 +2,13 @@ import SwiftUI
 
 /// Reveals a transient overlay on remote input and hides it again after a
 /// pause, so the clock normally shows no chrome at all.
+///
+/// `revealCount` is incremented on every press purely so `.task(id:)` can key
+/// on it: that restarts the countdown and cancels the previous one, with no
+/// manual `Task` bookkeeping.
 private struct OverlayRevealModifier: ViewModifier {
     @Binding var isVisible: Bool
 
-    /// Incremented on every press. `.task(id:)` keyed on this restarts the
-    /// countdown and cancels the previous one, with no manual Task bookkeeping.
     @State private var revealCount = 0
 
     func body(content: Content) -> some View {
