@@ -1,48 +1,36 @@
 import SwiftUI
 
-/// Assigns colours to the mesh's control points, and drifts them across the
-/// grid over time.
+/// Spreads a palette's stops across the mesh's control points.
 ///
-/// Point motion alone cannot make a colour travel. The mesh boundary is pinned
-/// so the gradient fills the screen, which means every point stays near where
-/// it started — and a colour welded to a point can only rock back and forth in
-/// its own corner. Moving the *colours* through the grid is what reads as a
-/// lava lamp.
+/// Deliberately time-invariant. Drifting the palette through the points makes
+/// each point's colour blend continuously from one stop to the next, which
+/// reads as colours fading out and others fading in — and at any instant some
+/// stop is not on screen at all. Welding each point to one stop keeps every
+/// colour present for good; what changes is where the points are, and so how
+/// much of the screen each colour covers.
 enum MeshColors {
-    /// Seconds for a colour to travel one full lap of the palette. Slow: a lap
-    /// is the whole journey from one end of the palette and back, and the
-    /// point is that you notice it has moved, not that you watch it move.
-    static let lapDuration: Double = 26
-
-    static func colors(_ stops: [Color], at time: Double) -> [Color] {
+    static func colors(_ stops: [Color]) -> [Color] {
         let ring = ring(of: stops)
-        let drift = time / lapDuration * Double(ring.count)
         return (0..<MeshPoints.pointCount).map { index in
             let row = index / MeshPoints.gridSize
             let column = index % MeshPoints.gridSize
-            // Banded along the diagonal, so colour sweeps corner to corner
+            // Banded along the diagonal, so colour runs corner to corner
             // rather than in rows or columns, which would read as a wipe.
-            return sample(ring, at: Double(row + column) + drift)
+            // Integer positions, so every point gets an exact stop rather than
+            // a blend of two.
+            return ring[(row + column) % ring.count]
         }
     }
 
-    /// Mirrors the palette so it loops without a seam: three stops become
-    /// a-b-c-b. Cycling a-b-c directly would butt the last stop against the
-    /// first once per lap, which is the harsh jump a hand-ordered palette
-    /// exists to avoid.
+    /// Mirrors the palette so neighbouring bands are always adjacent stops:
+    /// three stops become a-b-c-b. Without it the diagonal would wrap the last
+    /// stop straight back onto the first, which is the harsh jump a
+    /// hand-ordered palette exists to avoid.
+    ///
+    /// A 3x3's diagonal spans five bands, so every stop lands on at least one
+    /// point: `a b c b a` for three stops, `a b c d c` for four.
     private static func ring(of stops: [Color]) -> [Color] {
         guard stops.count > 2 else { return stops }
         return stops + stops.dropFirst().dropLast().reversed()
-    }
-
-    /// Reads the ring at a fractional position, blending the two stops it
-    /// falls between, so the drift is continuous rather than stepped.
-    private static func sample(_ ring: [Color], at position: Double) -> Color {
-        let count = Double(ring.count)
-        let wrapped = position.truncatingRemainder(dividingBy: count)
-        let base = wrapped < 0 ? wrapped + count : wrapped
-        let low = Int(base)
-        return ring[low % ring.count]
-            .mix(with: ring[(low + 1) % ring.count], by: base - Double(low))
     }
 }

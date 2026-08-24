@@ -21,7 +21,7 @@ struct AnimatedMeshBackground: View {
                 width: MeshPoints.gridSize,
                 height: MeshPoints.gridSize,
                 points: MeshPoints.points(at: moment),
-                colors: MeshColors.colors(stops, at: moment)
+                colors: MeshColors.colors(stops)
             )
             .ignoresSafeArea()
         }

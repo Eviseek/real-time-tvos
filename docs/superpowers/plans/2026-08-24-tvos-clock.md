@@ -1369,6 +1369,36 @@ the top-left corner, where previously regions only brightened and dimmed in
 place.
 
 
+**Correction to the previous revision — colours must not blend over time.**
+
+The drift added above was the wrong mechanism. Sampling the palette at
+`row + column + drift` made each point's colour slide continuously from one
+stop to the next, so colours faded out and others faded in, and at any instant
+some stop was absent from the screen entirely.
+
+`MeshColors` is now **time-invariant**: each point is welded to one exact stop
+at an integer ring position, so no blending occurs and every stop is on screen
+permanently. `lapDuration` is gone. What changes is where the points are, and
+therefore how much of the screen each colour covers.
+
+To make that movement large enough to read as travel, `defaultAmplitude` went
+0.18 to **0.34** and `speed` 5.0 to **3.0**. Large amplitudes are safe here
+because `freedom` keeps each point on its own edge or in the interior, so row
+and column order is preserved and the mesh cannot fold: an edge point sweeps
+0.16 to 0.84 along its edge, and the centre roams that range in both axes
+without reaching an edge. Velocity is roughly unchanged; the ground covered is
+nearly doubled.
+
+The mirrored ring is kept, now for a spatial rather than temporal reason: it
+stops the diagonal wrapping the last stop back onto the first. A 3x3 diagonal
+spans five bands, so every stop lands on at least one point — `a b c b a` for
+three stops, `a b c d c` for four.
+
+Verified on frames 22 seconds apart with the four-stop Synthwave horizon: all
+four stops present in both, with the dark purple growing from a small corner to
+a full quadrant and the orange expanding up the right side.
+
+
 ---
 
 ## Plan Self-Review

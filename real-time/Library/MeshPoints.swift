@@ -28,21 +28,24 @@ enum MeshPoints {
 
     /// How far a point may drift from its base position, in unit-square terms.
     ///
-    /// 0.18 is roughly 18% of the screen. This is the **distance** knob: raise
-    /// it for wider sweeps, lower it for a subtler drift. It is safe to raise
-    /// well past this without opening gaps at the screen edge, because
-    /// `freedom` pins the boundary — an edge point starting at 0.5 would have
-    /// to travel 0.5 to reach a corner.
-    static let defaultAmplitude: Double = 0.18
+    /// 0.34 is a third of the screen: this is what makes a colour visibly
+    /// change position and area rather than shimmer in place. Large values are
+    /// safe here because `freedom` keeps every point on its own edge or in the
+    /// interior, so row and column order is preserved and the mesh cannot fold.
+    /// An edge point sweeps 0.16 to 0.84 along its edge; the centre roams the
+    /// same range in both axes without ever reaching an edge.
+    static let defaultAmplitude: Double = 0.34
 
-    /// Multiplies every frequency below. This is the **speed** knob: 1.0 gives
-    /// the original 18-37 second periods, which read as nearly static on a
-    /// clock face. At 5.0 the points cycle every 4-7 seconds, so the gradient
-    /// is plainly in motion without becoming restless.
+    /// Multiplies every frequency below. This is the **speed** knob.
+    ///
+    /// 3.0 rather than the 5.0 used with the old smaller amplitude: the points
+    /// now cover nearly twice the distance, so the same pace would read as
+    /// hurried. Velocity is about what it was; the ground covered is far
+    /// greater, which is what makes it lava lamp rather than vibration.
     ///
     /// Scaling the table rather than editing each entry keeps the frequencies
     /// mutually detuned, which is what stops the motion looking mechanical.
-    static let speed: Double = 5.0
+    static let speed: Double = 3.0
 
     /// Which axes each control point may travel on: `1` is free, `0` is pinned.
     ///
