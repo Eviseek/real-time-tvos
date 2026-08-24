@@ -12,8 +12,15 @@ Four top-level folders under `real-time/`. Nothing lives outside them except
 |---|---|
 | `Library/` | Pure logic and reusable plumbing with no domain meaning: geometry, constants, view modifiers |
 | `Models/` | Domain types and their protocols, grouped in subfolders by domain (`Theme/`, `TimeZone/`, `Settings/`) |
-| `Views/` | SwiftUI views only, grouped in subfolders by screen area (`Clock/`, `Background/`, `Foreground/`, `Settings/`) |
+| `Views/` | SwiftUI views only, one subfolder per screen (`Clock/`, `ThemePicker/`, `TimeZonePicker/`) plus `Shared/` |
 | `Resources/` | Asset catalogs, Info.plist entries, localization |
+
+A view subfolder is a **screen**, not a kind of widget: everything the clock
+screen draws — including the settings bar that sits on top of it — lives in
+`Clock/`. A view used by more than one screen goes in `Views/Shared/` rather
+than in whichever screen happened to need it first; `BackgroundView` and
+`GlassClockText` are both used by the clock and by the theme tiles. If a view
+in `Shared/` turns out to have only one caller, move it into that screen.
 
 A model subfolder holds one domain: its types, its catalog, and the protocol
 those are consumed through. A type that only exists as part of another —
