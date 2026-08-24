@@ -79,8 +79,7 @@ nonisolated struct ThemeCatalog: ThemeProviding {
         name: "Night",
         themes: [
             mesh("starry-night", "Starry night", 0x0E1220, 0x171E38, 0x262F52),
-            mesh("night-aurora", "Aurora", 0x0B1520, 0x14524F, 0x58C9A0,
-                 foreground: .glass),
+            mesh("night-aurora", "Aurora", 0x0B1520, 0x14524F, 0x58C9A0),
             mesh("street-lights", "Street lights", 0x141220, 0x382E48, 0xD98A45),
             mesh("forest", "Forest", 0x0E1512, 0x17302B, 0x2C5449),
             mesh("moonlit-lake", "Moonlit lake", 0x101A2C, 0x2C4A6E, 0x8FA8BE),

@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Full-screen theme picker: one continuous scroll, a titled section per
+/// Full-screen theme picker: clock colour first, then one titled section per
 /// category. Sections are always open — there is nothing to collapse.
 struct ThemeGrid: View {
     @Environment(\.settings) private var settings
@@ -11,6 +11,7 @@ struct ThemeGrid: View {
             // Twenty-two live previews built eagerly would stall the focus
             // engine on first appearance.
             LazyVStack(alignment: .leading, spacing: Metrics.Grid.sectionSpacing) {
+                ClockColorSection()
                 ForEach(settings.themeCategories) { category in
                     ThemeSection(category: category)
                 }

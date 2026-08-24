@@ -1262,6 +1262,35 @@ dark palettes and rescues the bright ones; not applied, because it changes the
 look of every theme and that is a design decision.
 
 
+**Later revision — clock colour became a preference, not a theme property.**
+
+The theme list gained a first section, "Clock color", with four options:
+`Match theme`, `Light`, `Dark`, `Liquid glass`. New `ClockColor` enum in
+`Models/Settings/`, persisted as a fourth `UserDefaults` key and resolved
+against the active theme by `AppSettings.clockForeground`.
+
+This replaces per-theme glass. `Night/Aurora` no longer hardcodes
+`foreground: .glass` — no theme does. `Theme.foreground` is now read only by
+`ClockColor.matchTheme`, and glass is reachable only when the viewer asks for
+it. `ClockFace` takes a `ForegroundStyle` instead of a whole `Theme`.
+
+Measurement that prompted the change: glass lightens the glyphs, so it needs a
+dark field. Ranking all 33 palettes by mean luminance, only `Starry night`
+(0.017) and `Forest` (0.035) are dark enough for `.clear` glass to read —
+`Aurora`, the one theme that had it, scores 0.179. Glass as a per-theme
+property was therefore wrong on almost every palette it could have been
+applied to; as a preference the viewer owns the tradeoff.
+
+Theme tiles now preview with the chosen clock colour rather than the theme's
+own, so a tile cannot promise something the clock will not deliver.
+
+**Open issue — `Light` is the default and `Paper` has a light background.**
+White on `#F0F0F0` is about 1.06:1, so out of the box the clock is invisible on
+`Paper`. Defaulting to `.matchTheme` instead would fix it while still rendering
+white on all 34 other themes, since every one of them ships a white foreground.
+Left as specified pending a decision.
+
+
 ---
 
 ## Plan Self-Review

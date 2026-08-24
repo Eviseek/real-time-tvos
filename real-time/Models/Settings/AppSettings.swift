@@ -7,6 +7,7 @@ final class AppSettings: AppSettingsProviding {
         static let themeID = "themeID"
         static let timeZoneID = "timeZoneID"
         static let isAnimated = "isAnimated"
+        static let clockColor = "clockColor"
     }
 
     private let defaults: UserDefaults
@@ -18,6 +19,7 @@ final class AppSettings: AppSettingsProviding {
     var themeID: String { didSet { defaults.set(themeID, forKey: Keys.themeID) } }
     var timeZoneID: String { didSet { defaults.set(timeZoneID, forKey: Keys.timeZoneID) } }
     var isAnimated: Bool { didSet { defaults.set(isAnimated, forKey: Keys.isAnimated) } }
+    var clockColor: ClockColor { didSet { defaults.set(clockColor.rawValue, forKey: Keys.clockColor) } }
 
     init(defaults: UserDefaults = .standard, themes: any ThemeProviding = ThemeCatalog.shared) {
         self.defaults = defaults
@@ -27,9 +29,14 @@ final class AppSettings: AppSettingsProviding {
         // `object(forKey:)` rather than `bool(forKey:)`: the latter returns
         // false for a missing key, which would silently default to no motion.
         self.isAnimated = defaults.object(forKey: Keys.isAnimated) as? Bool ?? true
+        // Falls back to `.light` both when unset and when a stored value no
+        // longer maps to a case, the same way an unknown theme ID does.
+        self.clockColor = defaults.string(forKey: Keys.clockColor)
+            .flatMap { ClockColor(rawValue: $0) } ?? .light
     }
 
     var theme: Theme { themes.theme(id: themeID) }
     var timeZone: TimeZone { TimeZone(identifier: timeZoneID) ?? .current }
     var themeCategories: [ThemeCategory] { themes.categories }
+    var clockForeground: ForegroundStyle { clockColor.style(for: theme) }
 }

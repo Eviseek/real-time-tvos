@@ -5,6 +5,8 @@ struct ThemeTile: View {
     let theme: Theme
     let isSelected: Bool
 
+    @Environment(\.settings) private var settings
+
     var body: some View {
         VStack(spacing: Metrics.ThemeTile.captionSpacing) {
             ZStack {
@@ -12,7 +14,9 @@ struct ThemeTile: View {
                 // timeline would cost more than the screen it is previewing.
                 BackgroundView(style: theme.background, isAnimating: false)
                     .clipShape(.rect(cornerRadius: Metrics.ThemeTile.previewCornerRadius))
-                ThemeTilePreviewText(style: theme.foreground)
+                // Drawn with the chosen clock colour, not the theme's own, so
+                // a tile cannot promise something the clock will not deliver.
+                ThemeTilePreviewText(style: settings.clockColor.style(for: theme))
             }
             .frame(height: Metrics.ThemeTile.previewHeight)
 
