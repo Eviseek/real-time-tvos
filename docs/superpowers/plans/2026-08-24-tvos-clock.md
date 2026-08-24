@@ -383,6 +383,22 @@ git add real-time/Models/MeshPoints.swift real-time/Background/BackgroundView.sw
 git commit -m "feat: add mesh control-point geometry and static background rendering"
 ```
 
+**Implementation note — corner pinning was not sufficient.**
+
+The plan pinned only the four corner indices (0, 2, 6, 8). Building that
+produced dark wedges along all four screen edges: the *edge midpoints*
+(1, 3, 5, 7) were free in both axes, so moving index 1 off `y = 0` bowed the
+top boundary inward and left undefined color above it. A `MeshGradient`'s
+outer boundary is the drawn region, so any point leaving its edge shrinks the
+mesh below the screen bounds — the same failure the plan's check was written
+to catch, one ring further in.
+
+`MeshPoints` now uses a per-axis `freedom` mask instead of a set of pinned
+indices: corners are fixed in both axes, edge midpoints may slide **along**
+their own edge only, and the centre point alone is free in both. The gradient
+still animates; the boundary can no longer move.
+
+
 ---
 
 ### Task 4: The clock face

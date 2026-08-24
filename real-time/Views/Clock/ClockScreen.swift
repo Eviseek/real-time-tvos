@@ -5,7 +5,7 @@ struct ClockScreen: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            BackgroundView(style: settings.theme.background, isAnimating: settings.isAnimated)
             Text(settings.theme.name)
                 .font(.largeTitle)
                 .foregroundStyle(.white)
