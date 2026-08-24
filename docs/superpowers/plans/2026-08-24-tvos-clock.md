@@ -1196,6 +1196,25 @@ Notes on the palette:
   "Storm" were both implementation choices, not specified.
 
 
+**Later revision — sections replace the category picker.**
+
+The segmented category picker was dropped for one continuous scroll with a
+titled section per category. `ThemeCategoryPicker` and `ThemeCategorySegment`
+were deleted; `ThemeSection` (title plus tiles, no divider and no artwork) was
+added. `ThemeGrid` is now a `LazyVStack` of sections inside a `ScrollView`,
+lazy so twenty-two live previews are not all built on first appearance.
+
+`ThemeCategory.segment` was removed with the picker, along with the
+`segment(_:)` helper in the catalog and the five `category*` values in
+`Metrics.Grid`. The three-stop segment gradients supplied for each category
+therefore no longer appear anywhere in the app. Tinting the section titles with
+them was considered and rejected: Night and Calm both start near-black, so
+gradient-filled text would be unreadable on a dark background.
+
+Sections are plain `VStack`s, never `DisclosureGroup`, because they must not
+collapse.
+
+
 ---
 
 ## Plan Self-Review

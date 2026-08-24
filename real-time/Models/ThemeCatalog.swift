@@ -57,10 +57,6 @@ nonisolated struct ThemeCatalog: ThemeProviding {
                      foreground: foreground)
     }
 
-    private static func segment(_ stops: UInt32...) -> [Color] {
-        stops.map { Color(hex: $0) }
-    }
-
     // MARK: - Categories
 
     /// The only achromatic themes, and the only solid (non-animating) ones.
@@ -69,7 +65,6 @@ nonisolated struct ThemeCatalog: ThemeProviding {
     static let basics = ThemeCategory(
         id: "basics",
         name: "Basics",
-        segment: segment(0x000000, 0x6E6E73, 0xF2F2F7),
         themes: [
             Theme(id: "midnight", name: "Midnight",
                   background: .solid(.black), foreground: .solid(.white)),
@@ -82,7 +77,6 @@ nonisolated struct ThemeCatalog: ThemeProviding {
     private static let night = ThemeCategory(
         id: "night",
         name: "Night",
-        segment: segment(0x101528, 0x1E2C4A, 0x3B5578),
         themes: [
             mesh("starry-night", "Starry night", 0x0E1220, 0x171E38, 0x262F52),
             mesh("night-aurora", "Aurora", 0x0B1520, 0x14524F, 0x58C9A0,
@@ -96,7 +90,6 @@ nonisolated struct ThemeCatalog: ThemeProviding {
     private static let happiness = ThemeCategory(
         id: "happiness",
         name: "Happiness",
-        segment: segment(0x2A1B2E, 0xA85A3C, 0xE8B45C),
         themes: [
             // Solid, not glass: this palette runs light through its upper
             // half, and glass glyphs over a light field are illegible.
@@ -111,7 +104,6 @@ nonisolated struct ThemeCatalog: ThemeProviding {
     private static let calm = ThemeCategory(
         id: "calm",
         name: "Calm",
-        segment: segment(0x1A2228, 0x38505E, 0x7E97A6),
         themes: [
             mesh("misty-dawn", "Misty dawn", 0x182028, 0x3C5260, 0x8AA2AE),
             mesh("zen-garden", "Zen garden", 0x1E1C18, 0x4A4436, 0x9C9078),
@@ -124,7 +116,6 @@ nonisolated struct ThemeCatalog: ThemeProviding {
     private static let storm = ThemeCategory(
         id: "storm",
         name: "Storm",
-        segment: segment(0x1C1B2E, 0x46305E, 0xC24450),
         themes: [
             mesh("lightning", "Lightning", 0x12121F, 0x3A3A55, 0xD6CE6E),
             mesh("waves", "Waves", 0x102A36, 0x226A70, 0x9EC4C8),

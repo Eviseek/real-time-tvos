@@ -74,23 +74,18 @@ enum Metrics {
         /// anything nearer the bezel.
         static let padding: CGFloat = 60
 
-        /// Gap between category segments, and between the segment row and the
-        /// tiles below it.
-        static let categorySpacing: CGFloat = 24
+        /// Gap between one category section and the next. Wide, because it
+        /// is the only thing separating them — there is no divider.
+        static let sectionSpacing: CGFloat = 64
 
-        /// Category segment label. Smaller than a tile caption — a segment is
-        /// a signpost, not content.
-        static let categoryFontSize: CGFloat = 28
+        /// Gap between a section's title and its tiles. Tight, so the title
+        /// reads as belonging to the tiles under it rather than floating
+        /// between two sections.
+        static let sectionTitleSpacing: CGFloat = 20
 
-        /// Horizontal inset inside a category segment.
-        static let categoryHorizontalPadding: CGFloat = 28
-
-        /// Vertical inset inside a category segment.
-        static let categoryVerticalPadding: CGFloat = 12
-
-        /// Border on the selected category. Thick enough to read across a
-        /// room, since it is carrying the selection on its own.
-        static let categorySelectedBorderWidth: CGFloat = 4
+        /// Section title. Larger than a tile caption so the hierarchy is clear
+        /// at a glance while scrolling.
+        static let sectionTitleFontSize: CGFloat = 44
 
         /// Vertical breathing room inside one timezone row.
         static let zoneRowPadding: CGFloat = 8
