@@ -13,9 +13,10 @@ struct TimeZoneRow: View {
             Text(option.display)
                 // Long identifiers must not reflow the grid's row heights.
                 .lineLimit(1)
-            Spacer()
         }
         .padding(.vertical, Metrics.Grid.zoneRowPadding)
         .padding(.leading, Metrics.Grid.zoneRowLeadingPadding)
+        // Fills the cell so the row stays left-aligned however short the name.
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

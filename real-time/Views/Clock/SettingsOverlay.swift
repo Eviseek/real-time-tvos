@@ -4,30 +4,29 @@ import SwiftUI
 /// control whose state you need to read at a glance.
 struct SettingsOverlay: View {
     var body: some View {
-        VStack {
-            // One container so the bar refracts as a single piece of glass
-            // rather than as three unrelated slabs.
-            GlassEffectContainer {
-                HStack(spacing: Metrics.Overlay.buttonSpacing) {
-                    NavigationLink {
-                        ThemeGrid()
-                    } label: {
-                        SettingsBarIcon(title: "Theme", systemImage: "paintpalette")
-                    }
-                    NavigationLink {
-                        TimeZonePicker()
-                    } label: {
-                        SettingsBarIcon(title: "Timezone", systemImage: "globe")
-                    }
-                    AnimationToggleButton()
+        // One container so the bar refracts as a single piece of glass rather
+        // than as three unrelated slabs.
+        GlassEffectContainer {
+            HStack(spacing: Metrics.Overlay.buttonSpacing) {
+                NavigationLink {
+                    ThemeGrid()
+                } label: {
+                    SettingsBarIcon(title: "Theme", systemImage: "paintpalette")
                 }
-                .padding(.horizontal, Metrics.Overlay.horizontalPadding)
-                .padding(.vertical, Metrics.Overlay.verticalPadding)
-                .glassEffect(.regular, in: .capsule)
+                NavigationLink {
+                    TimeZonePicker()
+                } label: {
+                    SettingsBarIcon(title: "Timezone", systemImage: "globe")
+                }
+                AnimationToggleButton()
             }
-            .padding(.top, Metrics.Overlay.topPadding)
-
-            Spacer()
+            .padding(.horizontal, Metrics.Overlay.horizontalPadding)
+            .padding(.vertical, Metrics.Overlay.verticalPadding)
+            .glassEffect(.regular, in: .capsule)
         }
+        .padding(.top, Metrics.Overlay.topPadding)
+        // Pins the bar to the top of the clock screen. Horizontal centring
+        // comes from the ZStack it sits in.
+        .frame(maxHeight: .infinity, alignment: .top)
     }
 }

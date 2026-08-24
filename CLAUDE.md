@@ -107,6 +107,13 @@ creating a seam.
 - Background and clock stay `ZStack` **siblings**, never nested, so each ticks
   at its own rate (30fps vs 1Hz).
 - `.monospacedDigit()` on every view rendering time digits.
+- **No `Spacer()`.** To push a view to an edge or fill an axis, use
+  `.frame(maxWidth:)` / `.frame(maxHeight:)` with an `alignment:`. A `Spacer`
+  is an invisible sibling that only works inside a stack, so reaching for one
+  usually means adding a stack whose only job is to hold it — a frame states
+  the same intent on the view itself and needs no wrapper. Put the frame
+  **after** any padding, or the padding is added outside the filled area
+  instead of inside it.
 - Mesh backgrounds use exactly 9 colors (3×3). The four corner control points
   are never animated.
 
