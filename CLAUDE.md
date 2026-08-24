@@ -10,7 +10,7 @@ Four top-level folders under `real-time/`. Nothing lives outside them except
 
 | Folder | Holds |
 |---|---|
-| `Library/` | Reusable plumbing with no screen of its own: geometry, constants, extensions, view modifiers, and in `Library/Views/Shared/` any view used by more than one screen |
+| `Library/` | Reusable plumbing with no screen of its own: geometry, constants, extensions, view modifiers, and in `Library/Views/` any view used by more than one screen |
 | `Models/` | Domain types and their protocols, grouped in subfolders by domain (`Theme/`, `TimeZone/`, `Settings/`) |
 | `Views/` | One subfolder per screen and nothing else (`Clock/`, `ThemePicker/`, `TimeZonePicker/`) |
 | `Resources/` | Asset catalogs, Info.plist entries, localization |
@@ -20,11 +20,11 @@ the clock screen draws — including the settings bar that sits on top of it —
 lives in `Clock/`.
 
 A view used by more than one screen is reusable plumbing, so it belongs to
-`Library/Views/Shared/` rather than to whichever screen happened to need it
-first. `BackgroundView` and `GlassClockText` are both drawn by the clock and by
-the theme tiles. The test is the caller count, and it runs both ways: promote a
-view to `Library/Views/Shared/` when a second screen starts using it, and move
-it back down into a screen's folder when it drops to one caller.
+`Library/Views/` rather than to whichever screen happened to need it first.
+`BackgroundView` and `GlassClockText` are both drawn by the clock and by the
+theme tiles. The test is the caller count, and it runs both ways: promote a view
+to `Library/Views/` when a second screen starts using it, and move it back down
+into a screen's folder when it drops to one caller.
 
 A model subfolder holds one domain: its types, its catalog, and the protocol
 those are consumed through. A type that only exists as part of another —
