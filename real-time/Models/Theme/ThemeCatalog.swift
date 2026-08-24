@@ -24,33 +24,21 @@ nonisolated struct ThemeCatalog: ThemeProviding {
 
     // MARK: - Construction
 
-    /// Expands three stops into the 9 colors a 3x3 mesh needs, rotating them
-    /// so no two adjacent control points share a color and the gradient reads
-    /// as continuous rather than banded.
+    /// A three-stop palette. How the stops are spread across the mesh, and
+    /// how they drift, is `MeshColors`' business.
     private static func mesh(_ id: String, _ name: String,
                              _ first: UInt32, _ second: UInt32, _ third: UInt32) -> Theme {
-        let a = Color(hex: first), b = Color(hex: second), c = Color(hex: third)
-        return Theme(id: id, name: name,
-                     background: .mesh([a, b, c,
-                                        b, c, a,
-                                        c, a, b]))
+        Theme(id: id, name: name,
+              background: .mesh([Color(hex: first), Color(hex: second), Color(hex: third)]))
     }
 
-    /// Four stops, laid out along the diagonal instead of rotated.
-    ///
-    /// Rotation would put the first and last stop side by side, which is
-    /// exactly the harsh spectral jump a four-stop palette exists to avoid.
-    /// Running them corner to corner keeps the sequence in order, at the cost
-    /// of repeating the last stop to fill the ninth point.
+    /// A four-stop palette.
     private static func mesh(_ id: String, _ name: String,
                              _ first: UInt32, _ second: UInt32,
                              _ third: UInt32, _ fourth: UInt32) -> Theme {
-        let a = Color(hex: first), b = Color(hex: second)
-        let c = Color(hex: third), d = Color(hex: fourth)
-        return Theme(id: id, name: name,
-                     background: .mesh([a, b, c,
-                                        b, c, d,
-                                        c, d, d]))
+        Theme(id: id, name: name,
+              background: .mesh([Color(hex: first), Color(hex: second),
+                                 Color(hex: third), Color(hex: fourth)]))
     }
 
     // MARK: - Categories

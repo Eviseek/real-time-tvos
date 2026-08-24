@@ -2,7 +2,8 @@ import SwiftUI
 
 /// A mesh gradient whose interior control points drift continuously.
 struct AnimatedMeshBackground: View {
-    let colors: [Color]
+    /// The palette's stops; the nine control-point colors are derived.
+    let stops: [Color]
     let isAnimating: Bool
 
     /// 30fps rather than 60: the motion is slow enough that the two are
@@ -15,11 +16,12 @@ struct AnimatedMeshBackground: View {
         // `paused:` rather than swapping views, so the mesh keeps rendering
         // when motion is off instead of being replaced by something else.
         TimelineView(.animation(minimumInterval: Self.frameInterval, paused: !isAnimating)) { context in
+            let moment = elapsed(at: context.date)
             MeshGradient(
                 width: MeshPoints.gridSize,
                 height: MeshPoints.gridSize,
-                points: MeshPoints.points(at: elapsed(at: context.date)),
-                colors: colors
+                points: MeshPoints.points(at: moment),
+                colors: MeshColors.colors(stops, at: moment)
             )
             .ignoresSafeArea()
         }

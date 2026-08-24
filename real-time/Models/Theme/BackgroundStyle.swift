@@ -4,7 +4,9 @@ import SwiftUI
 enum BackgroundStyle: Hashable, Sendable {
     case solid(Color)
 
-    /// Exactly 9 colors, for a 3x3 `MeshGradient`.
+    /// The palette's stops, dark to light — three or four of them. Not the
+    /// nine a 3x3 `MeshGradient` needs: those are derived per frame by
+    /// `MeshColors`, which is what lets a colour drift across the grid.
     case mesh([Color])
 
     /// Only mesh backgrounds have anything to animate, so this gates the

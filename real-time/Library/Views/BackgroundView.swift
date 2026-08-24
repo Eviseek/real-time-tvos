@@ -17,8 +17,8 @@ struct BackgroundView: View {
         switch style {
         case .solid(let color):
             color.ignoresSafeArea()
-        case .mesh(let colors):
-            AnimatedMeshBackground(colors: colors, isAnimating: isAnimating && !reduceMotion)
+        case .mesh(let stops):
+            AnimatedMeshBackground(stops: stops, isAnimating: isAnimating && !reduceMotion)
         }
     }
 }

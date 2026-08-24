@@ -1335,6 +1335,40 @@ default-value question: the alternatives are dropping `Paper`, or reintroducing
 a per-theme override for it alone.
 
 
+**Later revision — colours now travel across the mesh (lava-lamp motion).**
+
+Symptom: each colour stayed in its own corner and rocked back and forth.
+
+Cause, and why more point motion could not fix it: colours were welded to
+control points, and the mesh boundary is pinned so the gradient fills the
+screen. Every point therefore stays near where it started, so a colour bound to
+one can only oscillate in place. The colours themselves had to move.
+
+Two changes:
+
+- **`MeshColors`** (new). `BackgroundStyle.mesh` now stores the palette's three
+  or four *stops* rather than nine pre-expanded colours, and the nine
+  control-point colours are derived per frame. Each point samples the palette at
+  `row + column + drift`, so colour bands sweep the diagonal and travel corner
+  to corner over `lapDuration` (26s). Sampling is fractional and blended with
+  `Color.mix(with:by:)`, so the drift is continuous rather than stepped.
+  The palette is mirrored into a ring first — three stops become a-b-c-b —
+  because cycling a-b-c directly would butt the last stop against the first
+  once per lap, the exact harsh jump a hand-ordered palette exists to avoid.
+  This also replaced the old rotation/diagonal expansion in `ThemeCatalog`,
+  which is now just `Theme(id:name:background:)`.
+
+- **`MeshPoints.wander`**. Each axis is a base sine plus a second harmonic at
+  0.37 of its frequency, weighted 0.45. A single sine traces the same straight
+  line forever and reads as a pendulum; two detuned sines make the path wander
+  and never quite retrace itself. Weights sum to 1 so travel stays inside
+  `amplitude` and the boundary stays pinned.
+
+Verified on frames 22 seconds apart: deep purple moved from the right half to
+the top-left corner, where previously regions only brightened and dimmed in
+place.
+
+
 ---
 
 ## Plan Self-Review

@@ -16,6 +16,9 @@ enum MeshPoints {
     /// exactly `gridSize * gridSize` colors.
     static let gridSize = 3
 
+    /// Total control points, and the number of colors `MeshGradient` requires.
+    static let pointCount = gridSize * gridSize
+
     /// Row-major 3x3 grid, in unit-square coordinates.
     static let base: [SIMD2<Double>] = [
         SIMD2(0.0, 0.0), SIMD2(0.5, 0.0), SIMD2(1.0, 0.0),
@@ -69,16 +72,35 @@ enum MeshPoints {
     /// their travel from the same place at launch.
     private static let phase: [Double] = [0, 0.00, 0, 1.70, 3.10, 4.60, 0, 2.40, 0]
 
+    /// A second harmonic is added to each axis at this fraction of the base
+    /// frequency. Irrational-ish on purpose: a single sine traces the same
+    /// straight line forever, which reads as a pendulum. Two detuned sines
+    /// make the path wander and never quite retrace itself.
+    private static let harmonicRatio: Double = 0.37
+
+    /// How much of the travel the second harmonic contributes. Enough to bend
+    /// the path off its axis, not enough to double the distance covered.
+    private static let harmonicWeight: Double = 0.45
+
     /// `MeshGradient` is defined over the unit square. A point outside it
     /// leaves part of the screen with no defined color.
     private static let domain: ClosedRange<Double> = 0...1
+
+    /// One axis of travel: a base wave plus a detuned second harmonic, summed
+    /// so the total stays within +/-1 and therefore within `amplitude`.
+    private static func wander(_ elapsed: Double, _ frequency: Double,
+                               _ phase: Double, _ wave: (Double) -> Double) -> Double {
+        let base = wave(elapsed * frequency + phase)
+        let harmonic = wave(elapsed * frequency * harmonicRatio + phase * 2)
+        return base * (1 - harmonicWeight) + harmonic * harmonicWeight
+    }
 
     static func points(at time: Double, amplitude: Double = defaultAmplitude) -> [SIMD2<Float>] {
         base.indices.map { index in
             let elapsed = time * speed
             let travel = SIMD2(
-                sin(elapsed * frequencyX[index] + phase[index]),
-                cos(elapsed * frequencyY[index] + phase[index])
+                wander(elapsed, frequencyX[index], phase[index], sin),
+                wander(elapsed, frequencyY[index], phase[index], cos)
             ) * amplitude * freedom[index]
             let moved = base[index] + travel
             return SIMD2(
