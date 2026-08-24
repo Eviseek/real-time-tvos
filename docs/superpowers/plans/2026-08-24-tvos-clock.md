@@ -958,6 +958,31 @@ git add real-time/Settings/ real-time/Clock/ClockScreen.swift
 git commit -m "feat: add auto-hiding settings overlay and theme selection grid"
 ```
 
+**Design change after the plan — the bar is permanent, and it is glass.**
+
+Requested after implementation: the control bar no longer auto-hides, and its
+background is `.glassEffect(.regular, in: .capsule)` inside a
+`GlassEffectContainer` rather than `.thinMaterial`.
+
+Consequences:
+
+- `OverlayRevealModifier` and `OverlayReveal` were **deleted**, not left
+  unused: with the bar permanent there is nothing to reveal, no 5s countdown,
+  and no `revealCount`. `ClockScreen` lost its `@State`, its `.focusable()`,
+  its `.onMoveCommand` / `.onPlayPauseCommand` / `.onExitCommand`, and its
+  `.task(id:)`, and is now a plain three-layer `ZStack`.
+- Focus no longer needs the screen itself to be focusable — the bar's buttons
+  are always on screen, so tvOS gives one of them initial focus.
+- The spec's "auto-hiding settings entry" requirement is superseded by this
+  change.
+
+Known cosmetic consequence, not yet addressed: on a solid theme the
+"Solid themes have nothing to flow" caption is now on screen permanently, and
+because it sits in a `VStack` under the Animation button it makes that button
+sit higher than its two neighbours. Previously this only showed for the five
+seconds the bar was up.
+
+
 ---
 
 ### Task 8: Searchable timezone picker
