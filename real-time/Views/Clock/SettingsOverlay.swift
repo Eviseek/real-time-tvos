@@ -1,25 +1,19 @@
 import SwiftUI
 
-/// The always-visible control bar: icons for the two screens, text for the one
-/// control whose state you need to read at a glance.
+/// The always-visible control bar.
 struct SettingsOverlay: View {
     var body: some View {
         // One container so the bar refracts as a single piece of glass rather
         // than as three unrelated slabs.
         GlassEffectContainer {
             HStack(spacing: Metrics.Overlay.buttonSpacing) {
-                NavigationLink {
-                    ThemeGrid()
-                } label: {
-                    SettingsBarIcon(title: "Theme", systemImage: "paintpalette")
-                }
-                NavigationLink {
-                    TimeZonePicker()
-                } label: {
-                    SettingsBarIcon(title: "Timezone", systemImage: "globe")
-                }
+                NavigationLink("Theme") { ThemeGrid() }
+                NavigationLink("Timezone") { TimeZonePicker() }
                 AnimationToggleButton()
             }
+            // Set once for the whole bar rather than on each control, so the
+            // three buttons cannot drift apart in size.
+            .font(.system(size: Metrics.Overlay.labelFontSize))
             .padding(.horizontal, Metrics.Overlay.horizontalPadding)
             .padding(.vertical, Metrics.Overlay.verticalPadding)
             .glassEffect(.regular, in: .capsule)

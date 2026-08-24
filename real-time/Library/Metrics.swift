@@ -106,12 +106,8 @@ enum Metrics {
     /// be looked at, so it reads as a thin strip of chrome rather than a
     /// toolbar competing with the time.
     enum Overlay {
-        /// Size of the icon-only Theme and Timezone glyphs. Large enough to
-        /// identify across a room, small enough to keep the bar a strip.
-        static let iconSize: CGFloat = 30
-
-        /// The animation control keeps its text, because its whole purpose is
-        /// telling you which state you are in — an icon cannot do that.
+        /// Type size for every control in the bar. Small enough to keep the
+        /// bar a thin strip, large enough to read across a room.
         static let labelFontSize: CGFloat = 24
 
         /// Gap between the bar's controls. Tight, since tvOS already draws a
