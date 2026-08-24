@@ -6,13 +6,13 @@
 
 **Architecture:** One `@Observable AppSettings` store injected via `.environment()`, plus a static catalog of `Theme` value types. Background and clock are `ZStack` siblings so each ticks at its own rate (30fps vs 1Hz). Theme IDs are persisted, never colors.
 
-**Tech Stack:** SwiftUI, tvOS 27, Swift 6 language mode with `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`. No third-party dependencies.
+**Tech Stack:** SwiftUI, tvOS 26, Swift 6 language mode with `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`. No third-party dependencies.
 
 **Spec:** `docs/superpowers/specs/2026-08-24-tvos-clock-design.md`
 
 ## Global Constraints
 
-- Deployment target tvOS 27.0; Swift version 6.0; default actor isolation `MainActor`
+- Deployment target tvOS 26.0; Swift version 6.0; default actor isolation `MainActor`
 - SwiftUI only. The single permitted UIKit use is `UIApplication.shared.isIdleTimerDisabled`
 - No third-party packages
 - **No automated tests** (standing user preference). Every task instead ends with a simulator build and a stated visual expectation

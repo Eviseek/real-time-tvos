@@ -34,7 +34,7 @@ Explicitly out of scope (decided during design):
 
 ## Platform Constraints
 
-- Deployment target: tvOS 27.0 (Xcode default; `MeshGradient` needs 18+ and
+- Deployment target: tvOS 26.0 (`MeshGradient` needs 18+ and
   `glassEffect` needs 26+, so both are satisfied)
 - Swift 6 language mode, `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`
 - SwiftUI only, no UIKit except `UIApplication.isIdleTimerDisabled`
