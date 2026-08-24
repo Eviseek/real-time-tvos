@@ -76,6 +76,10 @@ enum Metrics {
 
         /// Vertical breathing room inside one timezone row.
         static let zoneRowPadding: CGFloat = 8
+
+        /// Inset from the leading edge of a timezone row, so the city name is
+        /// not flush against the edge of the focus card it sits inside.
+        static let zoneRowLeadingPadding: CGFloat = 24
     }
 
     /// The always-visible settings bar.

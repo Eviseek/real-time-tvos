@@ -16,5 +16,6 @@ struct TimeZoneRow: View {
             Spacer()
         }
         .padding(.vertical, Metrics.Grid.zoneRowPadding)
+        .padding(.leading, Metrics.Grid.zoneRowLeadingPadding)
     }
 }
