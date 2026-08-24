@@ -1,115 +1,106 @@
 import Foundation
 
-/// Control-point geometry for the 3x3 mesh background.
+/// Control-point geometry for the mesh background.
 ///
-/// Pure math with no SwiftUI dependency, so it lives in `Library` and can be
-/// reasoned about without rendering anything.
+/// Pure math with no SwiftUI dependency, so it can be reasoned about without
+/// rendering anything.
 ///
 /// All phase arithmetic is deliberately `Double`, and only the final position
 /// narrows to `Float`. `MeshGradient` wants `SIMD2<Float>`, but the time value
-/// fed in is `timeIntervalSinceReferenceDate` — on the order of 8×10^8, where
+/// fed in is `timeIntervalSinceReferenceDate` — on the order of 8x10^8, where
 /// a `Float`'s ulp is **64 seconds**. Converting the timestamp first freezes
 /// the animation for a minute at a stretch and then jumps it.
 enum MeshPoints {
-    /// Both the width and the height of the control-point grid. A 3x3 mesh is
-    /// the smallest that has a movable centre, and `MeshGradient` requires
-    /// exactly `gridSize * gridSize` colors.
-    static let gridSize = 3
+    /// Grid width and height.
+    ///
+    /// 5 rather than 3 because the view only shows part of the mesh now (see
+    /// `MeshDrift`). On a 3x3 the palette's diagonal spans just five bands, so
+    /// a window over half the mesh could not hold every stop; at 5x5 the bands
+    /// repeat and every colour stays on screen wherever the mesh has drifted.
+    static let gridSize = 5
 
     /// Total control points, and the number of colors `MeshGradient` requires.
     static let pointCount = gridSize * gridSize
 
-    /// Row-major 3x3 grid, in unit-square coordinates.
-    static let base: [SIMD2<Double>] = [
-        SIMD2(0.0, 0.0), SIMD2(0.5, 0.0), SIMD2(1.0, 0.0),
-        SIMD2(0.0, 0.5), SIMD2(0.5, 0.5), SIMD2(1.0, 0.5),
-        SIMD2(0.0, 1.0), SIMD2(0.5, 1.0), SIMD2(1.0, 1.0),
-    ]
+    /// Distance between neighbouring points, in unit-square terms.
+    private static let spacing = 1 / Double(gridSize - 1)
 
-    /// How far a point may drift from its base position, in unit-square terms.
+    /// How far a point may drift from its base position.
     ///
-    /// 0.34 is a third of the screen: this is what makes a colour visibly
-    /// change position and area rather than shimmer in place. Large values are
-    /// safe here because `freedom` keeps every point on its own edge or in the
-    /// interior, so row and column order is preserved and the mesh cannot fold.
-    /// An edge point sweeps 0.16 to 0.84 along its edge; the centre roams the
-    /// same range in both axes without ever reaching an edge.
-    static let defaultAmplitude: Double = 0.34
+    /// Must stay below half of `spacing`: past that, neighbouring points cross,
+    /// the grid stops being monotone and the mesh folds over itself. The global
+    /// sweep in `MeshDrift` is what carries colours across the view; this is
+    /// only the local churn on top of it.
+    static let defaultAmplitude: Double = 0.09
 
-    /// Multiplies every frequency below. This is the **speed** knob.
-    ///
-    /// 3.0 rather than the 5.0 used with the old smaller amplitude: the points
-    /// now cover nearly twice the distance, so the same pace would read as
-    /// hurried. Velocity is about what it was; the ground covered is far
-    /// greater, which is what makes it lava lamp rather than vibration.
-    ///
-    /// Scaling the table rather than editing each entry keeps the frequencies
-    /// mutually detuned, which is what stops the motion looking mechanical.
+    /// Multiplies every point frequency. The distance knob is `amplitude`;
+    /// this is the pace knob.
     static let speed: Double = 3.0
 
-    /// Which axes each control point may travel on: `1` is free, `0` is pinned.
-    ///
-    /// Only the centre point is free in both. The mesh's outer boundary *is*
-    /// the drawn region, so any point that leaves the edge it sits on pulls
-    /// the boundary inward and leaves a wedge of undefined color at the screen
-    /// border. Corners are pinned outright; edge midpoints may slide **along**
-    /// their edge, which still animates the gradient without shrinking it.
-    private static let freedom: [SIMD2<Double>] = [
-        SIMD2(0, 0), SIMD2(1, 0), SIMD2(0, 0),
-        SIMD2(0, 1), SIMD2(1, 1), SIMD2(0, 1),
-        SIMD2(0, 0), SIMD2(1, 0), SIMD2(0, 0),
-    ]
-
-    /// Per-point horizontal frequency, in radians per second before `speed`.
-    ///
-    /// Detuned deliberately: shared frequencies drift in lockstep and read as
-    /// mechanical, while these values never visibly repeat. Entries for axes
-    /// that `freedom` pins are unused and left at zero.
-    private static let frequencyX: [Double] = [0, 0.31, 0, 0.23, 0.17, 0.29, 0, 0.19, 0]
-
-    /// Per-point vertical frequency. Different from `frequencyX` so the centre
-    /// point traces an open Lissajous path rather than a closed circle.
-    private static let frequencyY: [Double] = [0, 0.24, 0, 0.33, 0.21, 0.27, 0, 0.35, 0]
-
-    /// Per-point starting offset, in radians, so the points do not all begin
-    /// their travel from the same place at launch.
-    private static let phase: [Double] = [0, 0.00, 0, 1.70, 3.10, 4.60, 0, 2.40, 0]
-
     /// A second harmonic is added to each axis at this fraction of the base
-    /// frequency. Irrational-ish on purpose: a single sine traces the same
-    /// straight line forever, which reads as a pendulum. Two detuned sines
-    /// make the path wander and never quite retrace itself.
+    /// frequency. A single sine traces the same straight line forever, which
+    /// reads as a pendulum; two detuned sines wander and never quite retrace.
     private static let harmonicRatio: Double = 0.37
 
-    /// How much of the travel the second harmonic contributes. Enough to bend
-    /// the path off its axis, not enough to double the distance covered.
+    /// How much of the travel the second harmonic contributes.
     private static let harmonicWeight: Double = 0.45
 
     /// `MeshGradient` is defined over the unit square. A point outside it
-    /// leaves part of the screen with no defined color.
+    /// leaves part of the mesh with no defined color.
     private static let domain: ClosedRange<Double> = 0...1
 
-    /// One axis of travel: a base wave plus a detuned second harmonic, summed
-    /// so the total stays within +/-1 and therefore within `amplitude`.
-    private static func wander(_ elapsed: Double, _ frequency: Double,
-                               _ phase: Double, _ wave: (Double) -> Double) -> Double {
+    static func points(at time: Double, amplitude: Double = defaultAmplitude) -> [SIMD2<Float>] {
+        let elapsed = time * speed
+        return (0..<pointCount).map { index in
+            let row = index / gridSize
+            let column = index % gridSize
+            let base = SIMD2(Double(column) * spacing, Double(row) * spacing)
+            let travel = SIMD2(
+                wander(elapsed, index, axis: 0, wave: sin),
+                wander(elapsed, index, axis: 1, wave: cos)
+            ) * amplitude * freedom(row: row, column: column)
+            let moved = base + travel
+            return SIMD2(Float(moved.x.clamped(to: domain)),
+                         Float(moved.y.clamped(to: domain)))
+        }
+    }
+
+    /// Which axes a point may travel on: 1 is free, 0 is pinned.
+    ///
+    /// The mesh's outer boundary is the drawn region, so a point that leaves
+    /// the edge it sits on pulls the boundary inward and leaves undefined
+    /// color behind it. Points on an edge may slide **along** that edge but not
+    /// off it; corners, being on two edges, are pinned outright.
+    private static func freedom(row: Int, column: Int) -> SIMD2<Double> {
+        let last = gridSize - 1
+        let onSideEdge = column == 0 || column == last
+        let onTopOrBottom = row == 0 || row == last
+        return SIMD2(onSideEdge ? 0 : 1, onTopOrBottom ? 0 : 1)
+    }
+
+    /// Per-point, per-axis frequency and phase, derived from the index by
+    /// golden-ratio stepping rather than stored in a table: it spreads 50
+    /// values evenly with no two close together, and it scales with `gridSize`.
+    private static func frequency(_ index: Int, _ axis: Int) -> Double {
+        0.16 + fraction(Double(index * 2 + axis) * 0.6180339887) * 0.22
+    }
+
+    private static func phase(_ index: Int, _ axis: Int) -> Double {
+        fraction(Double(index * 2 + axis + 1) * 0.7548776662) * 2 * .pi
+    }
+
+    private static func fraction(_ value: Double) -> Double {
+        value - value.rounded(.down)
+    }
+
+    /// One axis of travel: a base wave plus a detuned second harmonic,
+    /// weighted so the total stays within +/-1 and therefore within amplitude.
+    private static func wander(_ elapsed: Double, _ index: Int, axis: Int,
+                               wave: (Double) -> Double) -> Double {
+        let frequency = frequency(index, axis)
+        let phase = phase(index, axis)
         let base = wave(elapsed * frequency + phase)
         let harmonic = wave(elapsed * frequency * harmonicRatio + phase * 2)
         return base * (1 - harmonicWeight) + harmonic * harmonicWeight
-    }
-
-    static func points(at time: Double, amplitude: Double = defaultAmplitude) -> [SIMD2<Float>] {
-        base.indices.map { index in
-            let elapsed = time * speed
-            let travel = SIMD2(
-                wander(elapsed, frequencyX[index], phase[index], sin),
-                wander(elapsed, frequencyY[index], phase[index], cos)
-            ) * amplitude * freedom[index]
-            let moved = base[index] + travel
-            return SIMD2(
-                Float(moved.x.clamped(to: domain)),
-                Float(moved.y.clamped(to: domain))
-            )
-        }
     }
 }

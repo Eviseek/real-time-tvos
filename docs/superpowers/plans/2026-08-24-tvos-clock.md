@@ -1399,6 +1399,42 @@ four stops present in both, with the dark purple growing from a small corner to
 a full quadrant and the orange expanding up the right side.
 
 
+**Later revision — the mesh is drawn oversized and swept, so colours cross the
+whole view.**
+
+Colours still sat in their corners. This is geometric, not a tuning problem: a
+pinned boundary is what guarantees the gradient covers the screen, and it
+therefore nails the corner colours in place. While the mesh edge *is* the screen
+edge, no per-point motion can carry a colour from one side of the view to the
+other.
+
+`MeshDrift` (new): the mesh is drawn `overscan` (1.9x) larger than the view and
+its centre is swept around on a slow detuned Lissajous path, up to `travel`
+(0.40) of the view in each axis. The pinned boundary is then always off-screen,
+and every colour crosses the whole visible area. The invariant to preserve is
+`travel < (overscan - 1) / 2`, or the pinned edge slides into view as a hard
+border.
+
+`MeshPoints` went from 3x3 to **5x5** (25 colors, so `MeshColors` returns 25).
+The view now shows only part of the mesh, and a 3x3 diagonal spans just five
+bands — a window over half the mesh could not hold every stop. At 5x5 the bands
+repeat, so every colour stays on screen wherever the mesh has drifted. Its
+frequency and phase tables were replaced by golden-ratio stepping from the point
+index, which spreads 50 values without a stored table and scales with
+`gridSize`. `defaultAmplitude` dropped 0.34 to 0.09, since points are now
+0.25 apart and crossing a neighbour folds the mesh; the global sweep, not local
+churn, is what moves colour across the view now.
+
+`AnimatedMeshBackground` is split: it owns the timeline and geometry, and the
+new `SweptMesh` owns the oversized frame and `position`. `position` rather than
+`offset` because `GeometryReader` anchors children top-leading, so an offset
+alone would not centre the oversized mesh.
+
+Verified on frames 26 seconds apart: orange moved from the top-left corner to
+spanning the whole top band, and the dark stop from a centre-left band to the
+right side — with all four stops present throughout.
+
+
 ---
 
 ## Plan Self-Review

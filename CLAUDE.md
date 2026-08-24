@@ -114,8 +114,13 @@ creating a seam.
   the same intent on the view itself and needs no wrapper. Put the frame
   **after** any padding, or the padding is added outside the filled area
   instead of inside it.
-- Mesh backgrounds use exactly 9 colors (3×3). The four corner control points
-  are never animated.
+- Mesh backgrounds are a 5×5 `MeshGradient`, so `MeshColors` must return
+  exactly 25 colors. Control points on the mesh boundary may slide **along**
+  their edge but never off it, and the four corners never move: the boundary is
+  the drawn region, so a point leaving it exposes undefined color.
+- The mesh is drawn larger than the view and swept beneath it (`MeshDrift`),
+  which is what lets a colour cross the whole screen. Any change to `overscan`
+  or `travel` must keep `travel < (overscan - 1) / 2`.
 
 ## Tests
 
