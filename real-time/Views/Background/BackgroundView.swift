@@ -8,18 +8,17 @@ struct BackgroundView: View {
     let style: BackgroundStyle
     let isAnimating: Bool
 
+    /// Continuous full-screen motion is exactly what this setting exists for,
+    /// so it overrides the user's animation preference rather than combining
+    /// with it as a suggestion.
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         switch style {
         case .solid(let color):
             color.ignoresSafeArea()
         case .mesh(let colors):
-            MeshGradient(
-                width: MeshPoints.gridSize,
-                height: MeshPoints.gridSize,
-                points: MeshPoints.points(at: 0),
-                colors: colors
-            )
-            .ignoresSafeArea()
+            AnimatedMeshBackground(colors: colors, isAnimating: isAnimating && !reduceMotion)
         }
     }
 }
