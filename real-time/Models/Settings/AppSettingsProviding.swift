@@ -18,8 +18,6 @@ protocol AppSettingsProviding: AnyObject, Observable {
     var theme: Theme { get }
     /// The resolved zone for `timeZoneID`, falling back to the device zone.
     var timeZone: TimeZone { get }
-    /// `clockColor` resolved against the current theme, ready to render.
-    var clockForeground: ForegroundStyle { get }
     /// Every selectable theme, grouped, so views never reach for the catalog
     /// directly.
     var themeCategories: [ThemeCategory] { get }

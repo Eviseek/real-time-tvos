@@ -32,11 +32,10 @@ final class AppSettings: AppSettingsProviding {
         // Falls back to `.light` both when unset and when a stored value no
         // longer maps to a case, the same way an unknown theme ID does.
         self.clockColor = defaults.string(forKey: Keys.clockColor)
-            .flatMap { ClockColor(rawValue: $0) } ?? .light
+            .flatMap { ClockColor(rawValue: $0) } ?? .white
     }
 
     var theme: Theme { themes.theme(id: themeID) }
     var timeZone: TimeZone { TimeZone(identifier: timeZoneID) ?? .current }
     var themeCategories: [ThemeCategory] { themes.categories }
-    var clockForeground: ForegroundStyle { clockColor.style(for: theme) }
 }

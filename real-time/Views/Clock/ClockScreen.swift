@@ -10,7 +10,7 @@ struct ClockScreen: View {
             ZStack {
                 // Siblings, never nested: background ticks at 30fps, clock at 1Hz.
                 BackgroundView(style: settings.theme.background, isAnimating: settings.isAnimated)
-                ClockFace(foreground: settings.clockForeground, timeZone: settings.timeZone)
+                ClockFace(color: settings.clockColor, timeZone: settings.timeZone)
                 SettingsOverlay()
             }
         }

@@ -15,7 +15,7 @@ struct ClockColorTile: View {
             ZStack {
                 BackgroundView(style: theme.background, isAnimating: false)
                     .clipShape(.rect(cornerRadius: Metrics.ThemeTile.previewCornerRadius))
-                ThemeTilePreviewText(style: option.style(for: theme))
+                ThemeTilePreviewText(color: option)
             }
             .frame(height: Metrics.ThemeTile.previewHeight)
 

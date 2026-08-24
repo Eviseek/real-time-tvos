@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ClockFace: View {
-    let foreground: ForegroundStyle
+    let color: ClockColor
     let timeZone: TimeZone
 
     /// One second — the smallest unit the clock displays, so there is nothing
@@ -13,8 +13,8 @@ struct ClockFace: View {
         // timelines would drag the digits up to the background's frame rate.
         TimelineView(.periodic(from: .now, by: Self.tickInterval)) { context in
             VStack(spacing: Metrics.Clock.stackSpacing) {
-                ClockTimeText(date: context.date, style: foreground, timeZone: timeZone)
-                TimeZoneLabel(timeZone: timeZone, color: foreground.secondaryColor)
+                ClockTimeText(date: context.date, color: color, timeZone: timeZone)
+                TimeZoneLabel(timeZone: timeZone, color: color.secondaryColor)
             }
             // Spoken as one phrase: "10:23:45" read glyph by glyph is three
             // unrelated numbers.

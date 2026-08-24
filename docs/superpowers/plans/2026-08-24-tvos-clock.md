@@ -1307,6 +1307,34 @@ one-line caption clamp added for the old long name is kept — it protects any
 future long name, not just that one.
 
 
+**Later revision — clock colour reduced to three options; themes lost their
+foreground.**
+
+`Match theme` was dropped, leaving `White`, `Black` and `Liquid glass`. Since
+every theme shipped a white foreground, `Match theme` duplicated `White` on 34
+of 35 themes and only diverged on `Paper`.
+
+That removal made two types dead, so both went with it:
+
+- `Theme.foreground` — nothing read it once `ClockColor.matchTheme` was gone.
+  `Theme` is now id, name and background.
+- `ForegroundStyle` — **deleted**. With three fixed options mapping to white,
+  black and glass, an intermediate style vocabulary added indirection without
+  expressive power. `ClockTimeText` and `ThemeTilePreviewText` now switch on
+  `ClockColor` directly, and `AppSettings.clockForeground` is gone.
+
+Persistence: `glass` keeps its raw value so an existing selection survives. A
+stored `light` or `dark` from the four-option version no longer maps and falls
+back to `.white`, the same graceful path an unknown theme ID takes.
+
+**Consequence for `Paper`.** It is the only light background, and with no
+per-theme foreground there is no way for it to specify dark digits. Anyone
+choosing `Paper` must also choose `Black`, or the clock is invisible
+(white on `#F0F0F0` is about 1.06:1). This is now structural rather than a
+default-value question: the alternatives are dropping `Paper`, or reintroducing
+a per-theme override for it alone.
+
+
 ---
 
 ## Plan Self-Review

@@ -28,14 +28,12 @@ nonisolated struct ThemeCatalog: ThemeProviding {
     /// so no two adjacent control points share a color and the gradient reads
     /// as continuous rather than banded.
     private static func mesh(_ id: String, _ name: String,
-                             _ first: UInt32, _ second: UInt32, _ third: UInt32,
-                             foreground: ForegroundStyle = .solid(.white)) -> Theme {
+                             _ first: UInt32, _ second: UInt32, _ third: UInt32) -> Theme {
         let a = Color(hex: first), b = Color(hex: second), c = Color(hex: third)
         return Theme(id: id, name: name,
                      background: .mesh([a, b, c,
                                         b, c, a,
-                                        c, a, b]),
-                     foreground: foreground)
+                                        c, a, b]))
     }
 
     /// Four stops, laid out along the diagonal instead of rotated.
@@ -46,15 +44,13 @@ nonisolated struct ThemeCatalog: ThemeProviding {
     /// of repeating the last stop to fill the ninth point.
     private static func mesh(_ id: String, _ name: String,
                              _ first: UInt32, _ second: UInt32,
-                             _ third: UInt32, _ fourth: UInt32,
-                             foreground: ForegroundStyle = .solid(.white)) -> Theme {
+                             _ third: UInt32, _ fourth: UInt32) -> Theme {
         let a = Color(hex: first), b = Color(hex: second)
         let c = Color(hex: third), d = Color(hex: fourth)
         return Theme(id: id, name: name,
                      background: .mesh([a, b, c,
                                         b, c, d,
-                                        c, d, d]),
-                     foreground: foreground)
+                                        c, d, d]))
     }
 
     // MARK: - Categories
@@ -66,11 +62,8 @@ nonisolated struct ThemeCatalog: ThemeProviding {
         id: "basics",
         name: "Basics",
         themes: [
-            Theme(id: "midnight", name: "Midnight",
-                  background: .solid(.black), foreground: .solid(.white)),
-            Theme(id: "paper", name: "Paper",
-                  background: .solid(Color(hex: 0xF0F0F0)),
-                  foreground: .solid(Color(hex: 0x141414))),
+            Theme(id: "midnight", name: "Midnight", background: .solid(.black)),
+            Theme(id: "paper", name: "Paper", background: .solid(Color(hex: 0xF0F0F0))),
         ]
     )
 

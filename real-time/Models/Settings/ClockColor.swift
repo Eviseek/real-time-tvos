@@ -1,17 +1,14 @@
 import SwiftUI
 
-/// How the user wants the clock digits drawn, independent of which theme is
-/// active.
+/// How the user wants the clock digits drawn.
 ///
-/// A preference rather than a property of the theme: the same palette suits a
-/// white clock in a bright room and a glass one at night, and forcing that
-/// choice into the catalog made it the designer's rather than the viewer's.
+/// Entirely a preference: a theme supplies a background and nothing else, so
+/// the same palette can carry white digits in a bright room and glass ones at
+/// night. Three options rather than four — there is no "match theme", because
+/// a theme no longer has a digit colour to match.
 enum ClockColor: String, CaseIterable, Identifiable, Sendable {
-    /// Whatever the theme itself specifies — the only option that can differ
-    /// per theme, and the one that keeps `Paper` legible.
-    case matchTheme
-    case light
-    case dark
+    case white
+    case black
     /// Liquid glass with nothing behind it, so the background shows through
     /// the glyphs. Needs a dark palette to read.
     case glass
@@ -20,19 +17,18 @@ enum ClockColor: String, CaseIterable, Identifiable, Sendable {
 
     var name: String {
         switch self {
-        case .matchTheme: "Match theme"
-        case .light: "Light"
-        case .dark: "Dark"
+        case .white: "White"
+        case .black: "Black"
         case .glass: "Liquid glass"
         }
     }
 
-    func style(for theme: Theme) -> ForegroundStyle {
+    /// Colour for text that is not the time itself. Glass has no colour of its
+    /// own to lend, so the label falls back to white.
+    var secondaryColor: Color {
         switch self {
-        case .matchTheme: theme.foreground
-        case .light: .solid(.white)
-        case .dark: .solid(.black)
-        case .glass: .glass
+        case .white, .glass: .white
+        case .black: .black
         }
     }
 }

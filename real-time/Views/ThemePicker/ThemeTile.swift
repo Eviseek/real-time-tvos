@@ -16,7 +16,7 @@ struct ThemeTile: View {
                     .clipShape(.rect(cornerRadius: Metrics.ThemeTile.previewCornerRadius))
                 // Drawn with the chosen clock colour, not the theme's own, so
                 // a tile cannot promise something the clock will not deliver.
-                ThemeTilePreviewText(style: settings.clockColor.style(for: theme))
+                ThemeTilePreviewText(color: settings.clockColor)
             }
             .frame(height: Metrics.ThemeTile.previewHeight)
 
