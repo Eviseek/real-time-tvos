@@ -1,9 +1,9 @@
-/// Supplies the available themes and resolves persisted identifiers.
+/// Supplies the available themes, grouped, and resolves persisted identifiers.
 ///
 /// A protocol rather than static members on `ThemeCatalog` so a test or
 /// preview can inject a two-theme catalog instead of the full set.
 protocol ThemeProviding: Sendable {
-    var all: [Theme] { get }
+    var categories: [ThemeCategory] { get }
     var defaultTheme: Theme { get }
 
     /// Resolves a persisted identifier, falling back to `defaultTheme` when

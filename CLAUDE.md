@@ -38,6 +38,12 @@ value.
 
 `0`, `1`, and `-1` used as identity or index values are not magic numbers.
 
+Palette hex literals in `ThemeCatalog` are also exempt: each one sits on the
+line that names the theme it belongs to, so `mesh("forest", "Forest",
+0x0E1512, ...)` already documents itself. Lifting seventy colors into
+separately named constants would add a layer of indirection without adding
+information.
+
 ## Views are at most 30 lines
 
 A view file's `struct` declaration is at most 30 lines, braces included. Past

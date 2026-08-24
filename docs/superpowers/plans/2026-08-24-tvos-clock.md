@@ -1164,6 +1164,38 @@ Requested after the always-visible change:
   edge. These two constants are the speed and distance knobs.
 
 
+**Later revision — themes are grouped into categories.**
+
+The catalog went from 6 flat themes to 22 themes in 5 categories: Basics,
+Night, Happiness, Calm, Storm. New types: `ThemeCategory` (id, name, a
+three-stop `segment` gradient for its picker segment, and its themes) and
+`Color(hex:)`. `ThemeProviding` now exposes `categories` instead of `all`, and
+`AppSettingsProviding.availableThemes` became `themeCategories`.
+
+`ThemeGrid` is now a category segment row above the tiles for the selected
+category, split into `ThemeCategoryPicker`, `ThemeCategorySegment` and
+`ThemeTileGrid` to stay inside the 30-line view limit. It opens on whichever
+category holds the current theme rather than always on the first.
+
+Notes on the palette:
+
+- Ember, Ocean, Aurora and Dusk were removed, superseded by the new system.
+  Midnight and Paper survive as `Basics` — the only solid backgrounds, and
+  Midnight is still the default and the lowest power draw on OLED.
+- `mesh` gained a four-stop overload for Rainbow. It lays the stops along the
+  diagonal instead of rotating them, because rotation would place the first and
+  last stop side by side, which is exactly the harsh spectral jump a four-stop
+  palette exists to avoid. The cost is repeating the last stop at the ninth
+  point.
+- Only Night's `Aurora` uses the glass foreground. Glass was tried on Rainbow
+  too and removed: that palette runs light through its upper half, and glass
+  glyphs over a light field are illegible. Every other theme is
+  `.solid(.white)`, which the Calm set confirmed is legible even over Snow's
+  bright ceiling.
+- The `Basics` segment gradient and the shortening of "Energy / Storm" to
+  "Storm" were both implementation choices, not specified.
+
+
 ---
 
 ## Plan Self-Review

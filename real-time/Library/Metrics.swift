@@ -74,6 +74,24 @@ enum Metrics {
         /// anything nearer the bezel.
         static let padding: CGFloat = 60
 
+        /// Gap between category segments, and between the segment row and the
+        /// tiles below it.
+        static let categorySpacing: CGFloat = 24
+
+        /// Category segment label. Smaller than a tile caption — a segment is
+        /// a signpost, not content.
+        static let categoryFontSize: CGFloat = 28
+
+        /// Horizontal inset inside a category segment.
+        static let categoryHorizontalPadding: CGFloat = 28
+
+        /// Vertical inset inside a category segment.
+        static let categoryVerticalPadding: CGFloat = 12
+
+        /// Border on the selected category. Thick enough to read across a
+        /// room, since it is carrying the selection on its own.
+        static let categorySelectedBorderWidth: CGFloat = 4
+
         /// Vertical breathing room inside one timezone row.
         static let zoneRowPadding: CGFloat = 8
 

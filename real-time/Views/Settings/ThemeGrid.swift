@@ -1,31 +1,30 @@
 import SwiftUI
 
-/// Full-screen theme picker.
+/// Full-screen theme picker: a category row above the tiles for that category.
 struct ThemeGrid: View {
     @Environment(\.settings) private var settings
-    @Environment(\.dismiss) private var dismiss
 
-    private let columns = [GridItem(.adaptive(minimum: Metrics.Grid.themeColumnMinimum),
-                                   spacing: Metrics.Grid.themeSpacing)]
+    /// Nil until the user picks one. Until then the picker opens on whichever
+    /// category holds the current theme, which is where they left off.
+    @State private var pickedID: String?
 
-    var body: some View {
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: Metrics.Grid.themeSpacing) {
-                ForEach(settings.availableThemes) { theme in
-                    Button { select(theme) } label: {
-                        ThemeTile(theme: theme, isSelected: theme.id == settings.themeID)
-                    }
-                    // Apple's standard tvOS tile treatment. A focus appearance
-                    // is not optional on a platform navigated by focus.
-                    .buttonStyle(.card)
-                }
-            }
-            .padding(Metrics.Grid.padding)
-        }
+    private var categories: [ThemeCategory] { settings.themeCategories }
+
+    private var shown: ThemeCategory {
+        categories.first { $0.id == pickedID }
+            ?? categories.first { $0.contains(themeID: settings.themeID) }
+            ?? categories[0]
     }
 
-    private func select(_ theme: Theme) {
-        settings.themeID = theme.id
-        dismiss()
+    var body: some View {
+        VStack(spacing: Metrics.Grid.categorySpacing) {
+            ThemeCategoryPicker(categories: categories, selectedID: shown.id) {
+                pickedID = $0
+            }
+            ScrollView {
+                ThemeTileGrid(themes: shown.themes)
+            }
+        }
+        .padding(Metrics.Grid.padding)
     }
 }

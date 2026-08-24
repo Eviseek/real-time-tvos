@@ -31,5 +31,5 @@ final class AppSettings: AppSettingsProviding {
 
     var theme: Theme { themes.theme(id: themeID) }
     var timeZone: TimeZone { TimeZone(identifier: timeZoneID) ?? .current }
-    var availableThemes: [Theme] { themes.all }
+    var themeCategories: [ThemeCategory] { themes.categories }
 }
