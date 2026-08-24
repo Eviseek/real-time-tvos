@@ -2,11 +2,15 @@ import SwiftUI
 
 /// The selectable rows. Split from `TimeZonePicker` so the picker holds only
 /// the search state and this holds only the selection.
+///
+/// Reports selection through `onSelected` rather than dismissing itself: this
+/// sits inside `.searchable`'s content, where the ambient `DismissAction`
+/// belongs to the search rather than to the screen.
 struct TimeZoneGrid: View {
     let options: [TimeZoneOption]
+    let onSelected: () -> Void
 
     @Environment(\.settings) private var settings
-    @Environment(\.dismiss) private var dismiss
 
     private let columns = [GridItem(.adaptive(minimum: Metrics.Grid.zoneColumnMinimum),
                                    spacing: Metrics.Grid.zoneSpacing)]
@@ -27,6 +31,6 @@ struct TimeZoneGrid: View {
 
     private func select(_ option: TimeZoneOption) {
         settings.timeZoneID = option.id
-        dismiss()
+        onSelected()
     }
 }
