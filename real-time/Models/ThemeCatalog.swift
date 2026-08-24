@@ -94,7 +94,6 @@ nonisolated struct ThemeCatalog: ThemeProviding {
             // Solid, not glass: this palette runs light through its upper
             // half, and glass glyphs over a light field are illegible.
             mesh("rainbow", "Rainbow", 0x2A2340, 0xC25C63, 0xD9B45C, 0x4FA89E),
-            mesh("sunshine", "Sunshine", 0x3A2A1E, 0xC98A32, 0xE8CB7A),
             mesh("meadow", "Meadow", 0x1E2A1C, 0x6E8C4A, 0xD6C87A),
             mesh("sunflower", "Sunflower", 0x2A2412, 0xB8891C, 0xE0CE72),
             mesh("golden-hour", "Golden hour", 0x2C1E2A, 0xC4795C, 0xE8C49A),
@@ -105,11 +104,9 @@ nonisolated struct ThemeCatalog: ThemeProviding {
         id: "calm",
         name: "Calm",
         themes: [
-            mesh("misty-dawn", "Misty dawn", 0x182028, 0x3C5260, 0x8AA2AE),
             mesh("zen-garden", "Zen garden", 0x1E1C18, 0x4A4436, 0x9C9078),
             mesh("fog", "Fog", 0x1C2124, 0x454F55, 0x8A979E),
             mesh("snow", "Snow", 0x20262E, 0x4E5D6B, 0xC3CFD8),
-            mesh("rain-on-window", "Rain on window", 0x161E24, 0x3A4C58, 0x7C8F9C),
         ]
     )
 
@@ -121,11 +118,71 @@ nonisolated struct ThemeCatalog: ThemeProviding {
             mesh("waves", "Waves", 0x102A36, 0x226A70, 0x9EC4C8),
             mesh("volcanic", "Volcanic", 0x1C0F0E, 0x6E2214, 0xD9662A),
             mesh("sandstorm", "Sandstorm", 0x2E2418, 0x8E6640, 0xC9AC80),
-            mesh("rapids", "Rapids", 0x12302C, 0x2C7064, 0xA8CFC6),
+        ]
+    )
+
+    // MARK: - Vivid tier
+    //
+    // The same four moods at high chroma. Kept as separate sections rather
+    // than merged into their muted counterparts, because the difference is a
+    // deliberate choice rather than a variation: nobody wants a neon theme
+    // when they came looking for a quiet one.
+
+    private static let vividNight = ThemeCategory(
+        id: "vivid-night",
+        name: "Vivid Night",
+        themes: [
+            mesh("neon-city", "Neon city", 0x0A0A14, 0xD42A8C, 0xFF3D9E),
+            mesh("synthwave-horizon", "Synthwave horizon",
+                 0x12061F, 0x8B1FA8, 0xFF5FA2, 0xFFB35C),
+            mesh("blacklight-forest", "Blacklight forest", 0x060E0C, 0x1FBF6E, 0x6BFF9E),
+            mesh("deep-sea", "Deep-sea bioluminescence", 0x04101F, 0x0F6ED9, 0x35E5FF),
+        ]
+    )
+
+    private static let vividHappiness = ThemeCategory(
+        id: "vivid-happiness",
+        name: "Vivid Happiness",
+        themes: [
+            mesh("electric-rainbow", "Electric rainbow",
+                 0x1A0A2E, 0xFF2E93, 0xFFC93D, 0x2EE8B0),
+            mesh("hot-sunshine", "Hot sunshine", 0x2E1206, 0xFF6B1F, 0xFFD84D),
+            mesh("neon-meadow", "Neon meadow", 0x0E2010, 0x4DE83D, 0xE8FF5C),
+            mesh("candy-sunset", "Candy sunset", 0x2A0E2A, 0xFF4D8F, 0xFFA85C),
+            mesh("confetti-burst", "Confetti burst",
+                 0x160C2E, 0xFF3D6E, 0x3DD9FF, 0xFFE03D),
+        ]
+    )
+
+    /// Calm resists neon by definition, so this tier is a glow rather than a
+    /// blast: single-hue, high chroma, deliberately little variety.
+    private static let vividCalm = ThemeCategory(
+        id: "vivid-calm",
+        name: "Vivid Calm",
+        themes: [
+            mesh("ice-glow", "Ice glow", 0x0A1620, 0x2E9ED9, 0x7FE8FF),
+            mesh("neon-mist", "Neon mist", 0x12141F, 0x5C6BD9, 0xA8B5FF),
+            mesh("menthol-water", "Menthol water", 0x08201C, 0x1FC4A8, 0x6BFFE0),
+        ]
+    )
+
+    private static let vividStorm = ThemeCategory(
+        id: "vivid-storm",
+        name: "Vivid Storm",
+        themes: [
+            mesh("electric-lightning", "Electric lightning", 0x0A0A1F, 0x6B3DFF, 0xE0FF3D),
+            mesh("lava-surge", "Lava surge", 0x1A0606, 0xE02414, 0xFF8A1F),
+            mesh("plasma-waves", "Plasma waves", 0x04161F, 0x0F9ED9, 0x3DFFE0),
+            mesh("voltage", "Voltage", 0x0E0A1F, 0xB82EFF, 0xFF2E6B),
+            mesh("redline", "Redline", 0x1A0410, 0xFF1F5C, 0xFF9E3D),
         ]
     )
 
     private static let allCategories: [ThemeCategory] = [
-        basics, night, happiness, calm, storm,
+        basics,
+        night, vividNight,
+        happiness, vividHappiness,
+        calm, vividCalm,
+        storm, vividStorm,
     ]
 }

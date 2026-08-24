@@ -1215,6 +1215,53 @@ Sections are plain `VStack`s, never `DisclosureGroup`, because they must not
 collapse.
 
 
+**Later revision — vivid tier added, near-duplicates removed.**
+
+The catalog is now 35 themes in 9 sections: Basics, then each of the four
+moods followed by its vivid counterpart. Vivid variants are separate sections
+rather than merged into their muted counterparts, because the difference is a
+deliberate choice, not a variation.
+
+Similarity was measured rather than eyeballed: each gradient was sampled at 9
+points, converted to CIE Lab, and compared pairwise as mean dE76. Below 10
+counts as a near-duplicate.
+
+Removed from the existing set:
+
+| Theme | dE | Nearest |
+|---|---|---|
+| Misty dawn | 3.7 | Rain on window |
+| Rain on window | 4.4 | Fog |
+| Sunshine | 8.1 | Sunflower |
+| Rapids | 10.6 | Waves |
+
+`Misty dawn`, `Fog` and `Rain on window` were effectively one gradient three
+times; `Fog` was kept because its neutrality sits furthest from `Snow`.
+
+Skipped from the new set:
+
+| Theme | dE | Nearest | Why this one |
+|---|---|---|---|
+| Cyber aurora | 9.7 | Menthol water | Vivid Night keeps a mint-green in Blacklight forest; Vivid Calm would have dropped to two themes |
+| Moon halo | 7.8 | Neon mist | Neon mist's violet adds hue variety to an otherwise all-cyan section |
+
+Minimum separation across the surviving 33 gradients rose from dE 3.7 to 10.2.
+
+`ThemeTileCaption` gained `.lineLimit(1)` and a minimum scale factor: "Deep-sea
+bioluminescence" would otherwise wrap and make its tile taller than the others
+in its row.
+
+**Open issue — white foreground contrast.** Measured white against each
+palette's brightest stop: 27 of 33 fall below the WCAG 3.0:1 floor for large
+text, worst at Neon meadow (1.11:1 against `#E8FF5C`). This is pre-existing and
+not specific to the vivid tier — Sunflower (1.59:1) and Snow (1.59:1) were
+already there. It is a worst case rather than the typical one, since the
+brightest region of an animated mesh is usually not under the digits. The
+standard fix is a soft dark shadow behind the glyphs, which costs nothing on
+dark palettes and rescues the bright ones; not applied, because it changes the
+look of every theme and that is a design decision.
+
+
 ---
 
 ## Plan Self-Review

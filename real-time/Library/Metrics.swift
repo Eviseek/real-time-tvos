@@ -49,6 +49,11 @@ enum Metrics {
         /// Gap between the checkmark and the theme name.
         static let captionItemSpacing: CGFloat = 8
 
+        /// How far a long theme name may shrink before it would truncate.
+        /// 0.7 fits the longest shipped name at tile width; below that the
+        /// caption stops matching its neighbours in size.
+        static let captionMinimumScale: CGFloat = 0.7
+
         /// Space beneath the theme name, so it is not crowded against the
         /// bottom edge of the focus card the tile sits inside.
         static let captionBottomPadding: CGFloat = 16
