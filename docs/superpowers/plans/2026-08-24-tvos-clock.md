@@ -589,6 +589,24 @@ git add real-time/Background/
 git commit -m "feat: animate mesh background at 30fps with reduce-motion support"
 ```
 
+**Implementation note — `Float` cannot hold the timestamp.**
+
+With the plan's code the gradient was static: two frames 13 seconds apart were
+pixel-identical. `MeshGradient` takes `SIMD2<Float>`, so the plan converted the
+time to `Float` first — but the time fed in is
+`timeIntervalSinceReferenceDate`, currently about 8.09x10^8, and a `Float`'s
+ulp at that magnitude is **64 seconds**. Every timestamp inside a 64-second
+window collapses to the same value, so the animation froze for a minute at a
+time and then jumped.
+
+Verified directly rather than by eye: `Float(now).ulp` prints `64.0`, and
+`sin(Float(now + delta) * 0.17)` returns an identical result for delta of 0, 1,
+5, and 13 seconds.
+
+`MeshPoints` now keeps all phase arithmetic in `Double` and narrows only the
+final position to `Float`. Same public signature, so no call site changed.
+
+
 ---
 
 ### Task 6: Glass glyphs — spike, then implement
