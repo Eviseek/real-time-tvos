@@ -100,11 +100,12 @@ enum Metrics {
         static let zoneRowLeadingPadding: CGFloat = 24
     }
 
-    /// The always-visible settings bar.
+    /// The settings bar.
     ///
-    /// Deliberately small: it sits on screen permanently over a clock meant to
-    /// be looked at, so it reads as a thin strip of chrome rather than a
-    /// toolbar competing with the time.
+    /// Deliberately small: it sits over a clock meant to be looked at, so it
+    /// reads as a thin strip of chrome rather than a toolbar competing with
+    /// the time. It also hides itself after a few seconds of no remote input
+    /// — see `SettingsOverlay`.
     enum Overlay {
         /// Type size for every control in the bar. Small enough to keep the
         /// bar a thin strip, large enough to read across a room.

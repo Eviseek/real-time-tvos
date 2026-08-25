@@ -1,26 +1,33 @@
 import SwiftUI
 
-/// The always-visible control bar.
+/// The control bar, hidden after a few seconds of no remote input so it does
+/// not compete with the clock, and back the instant the remote is touched.
 struct SettingsOverlay: View {
+    /// Whichever control holds focus — the signal `hidesWhenIdle` reads.
+    private enum Control: Hashable { case theme, timezone, animation }
+
+    @FocusState private var focusedControl: Control?
+
+    /// How long the bar stays up after the last interaction before it fades.
+    private static let hideDelay: Duration = .seconds(5)
+
     var body: some View {
-        // One container so the bar refracts as a single piece of glass rather
-        // than as three unrelated slabs.
         GlassEffectContainer {
             HStack(spacing: Metrics.Overlay.buttonSpacing) {
                 NavigationLink("Theme") { ThemeGrid() }
+                    .focused($focusedControl, equals: .theme)
                 NavigationLink("Timezone") { TimeZonePicker() }
+                    .focused($focusedControl, equals: .timezone)
                 AnimationToggleButton()
+                    .focused($focusedControl, equals: .animation)
             }
-            // Set once for the whole bar rather than on each control, so the
-            // three buttons cannot drift apart in size.
             .font(.system(size: Metrics.Overlay.labelFontSize))
             .padding(.horizontal, Metrics.Overlay.horizontalPadding)
             .padding(.vertical, Metrics.Overlay.verticalPadding)
             .glassEffect(.regular, in: .capsule)
         }
         .padding(.top, Metrics.Overlay.topPadding)
-        // Pins the bar to the top of the clock screen. Horizontal centring
-        // comes from the ZStack it sits in.
         .frame(maxHeight: .infinity, alignment: .top)
+        .hidesWhenIdle(after: Self.hideDelay, resetting: focusedControl)
     }
 }
