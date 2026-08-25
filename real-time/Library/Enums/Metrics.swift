@@ -22,6 +22,16 @@ enum Metrics {
         /// enough to read across a room, small enough to stay secondary.
         static let zoneFontSize: CGFloat = 44
 
+        /// The AM/PM marker beside the digits. Roughly a quarter of the
+        /// time's size: it has to read as an annotation on the digits rather
+        /// than as another word in the string, and anything larger widens the
+        /// 12-hour face enough to shift the digits off centre.
+        static let dayPeriodFontSize: CGFloat = 56
+
+        /// Gap between the seconds and the marker. Wider than a space in the
+        /// digit font, so the marker reads as a separate token.
+        static let dayPeriodSpacing: CGFloat = 16
+
         /// Gap between the time and the city name. Generous, so the two read
         /// as separate lines of information rather than one block.
         static let stackSpacing: CGFloat = 28
@@ -98,6 +108,19 @@ enum Metrics {
         /// Inset from the leading edge of a timezone row, so the city name is
         /// not flush against the edge of the focus card it sits inside.
         static let zoneRowLeadingPadding: CGFloat = 24
+    }
+
+    /// The settings screen: a short list of switches rather than a grid.
+    enum Settings {
+        /// Type size for one row's label. Below a section title so the title
+        /// still leads, and well above it in size next to a picker's tiles
+        /// because a row is a whole line of the screen.
+        static let rowFontSize: CGFloat = 34
+
+        /// Width of a settings row. The switch sits at the row's trailing
+        /// edge, and across a full 1080p screen it would end up a hand's width
+        /// away from the label it belongs to.
+        static let rowWidth: CGFloat = 720
     }
 
     /// The settings bar.

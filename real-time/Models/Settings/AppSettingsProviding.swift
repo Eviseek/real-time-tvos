@@ -13,6 +13,7 @@ protocol AppSettingsProviding: AnyObject, Observable {
     var timeZoneID: String { get set }
     var isAnimated: Bool { get set }
     var clockColor: ClockColor { get set }
+    var uses24HourTime: Bool { get set }
 
     /// The resolved theme for `themeID`, falling back when it is unknown.
     var theme: Theme { get }

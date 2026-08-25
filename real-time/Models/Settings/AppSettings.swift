@@ -8,6 +8,7 @@ final class AppSettings: AppSettingsProviding {
         static let timeZoneID = "timeZoneID"
         static let isAnimated = "isAnimated"
         static let clockColor = "clockColor"
+        static let uses24HourTime = "uses24HourTime"
     }
 
     private let defaults: UserDefaults
@@ -20,6 +21,7 @@ final class AppSettings: AppSettingsProviding {
     var timeZoneID: String { didSet { defaults.set(timeZoneID, forKey: Keys.timeZoneID) } }
     var isAnimated: Bool { didSet { defaults.set(isAnimated, forKey: Keys.isAnimated) } }
     var clockColor: ClockColor { didSet { defaults.set(clockColor.rawValue, forKey: Keys.clockColor) } }
+    var uses24HourTime: Bool { didSet { defaults.set(uses24HourTime, forKey: Keys.uses24HourTime) } }
 
     init(defaults: UserDefaults = .standard, themes: any ThemeProviding = ThemeCatalog.shared) {
         self.defaults = defaults
@@ -33,6 +35,10 @@ final class AppSettings: AppSettingsProviding {
         // longer maps to a case, the same way an unknown theme ID does.
         self.clockColor = defaults.string(forKey: Keys.clockColor)
             .flatMap { ClockColor(rawValue: $0) } ?? .white
+        // Same `object(forKey:)` reason as `isAnimated`: a missing key must
+        // mean the 24-hour clock this app has always shown, not the 12-hour
+        // one a plain `bool(forKey:)` would fall back to.
+        self.uses24HourTime = defaults.object(forKey: Keys.uses24HourTime) as? Bool ?? true
     }
 
     var theme: Theme { themes.theme(id: themeID) }

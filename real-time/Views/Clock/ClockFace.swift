@@ -3,6 +3,7 @@ import SwiftUI
 struct ClockFace: View {
     let color: ClockColor
     let timeZone: TimeZone
+    let uses24HourTime: Bool
 
     private static let tickInterval: TimeInterval = 1
 
@@ -11,7 +12,10 @@ struct ClockFace: View {
         // timelines would drag the digits up to the background's frame rate.
         TimelineView(.periodic(from: .now, by: Self.tickInterval)) { context in
             VStack(spacing: Metrics.Clock.stackSpacing) {
-                ClockTimeText(date: context.date, color: color, timeZone: timeZone)
+                ClockTimeText(date: context.date,
+                              color: color,
+                              timeZone: timeZone,
+                              uses24HourTime: uses24HourTime)
                 zoneLabel
             }
             .accessibilityElement(children: .combine)
