@@ -383,6 +383,22 @@ git add real-time/Models/MeshPoints.swift real-time/Background/BackgroundView.sw
 git commit -m "feat: add mesh control-point geometry and static background rendering"
 ```
 
+**Implementation note — corner pinning was not sufficient.**
+
+The plan pinned only the four corner indices (0, 2, 6, 8). Building that
+produced dark wedges along all four screen edges: the *edge midpoints*
+(1, 3, 5, 7) were free in both axes, so moving index 1 off `y = 0` bowed the
+top boundary inward and left undefined color above it. A `MeshGradient`'s
+outer boundary is the drawn region, so any point leaving its edge shrinks the
+mesh below the screen bounds — the same failure the plan's check was written
+to catch, one ring further in.
+
+`MeshPoints` now uses a per-axis `freedom` mask instead of a set of pinned
+indices: corners are fixed in both axes, edge midpoints may slide **along**
+their own edge only, and the centre point alone is free in both. The gradient
+still animates; the boundary can no longer move.
+
+
 ---
 
 ### Task 4: The clock face
@@ -573,6 +589,24 @@ git add real-time/Background/
 git commit -m "feat: animate mesh background at 30fps with reduce-motion support"
 ```
 
+**Implementation note — `Float` cannot hold the timestamp.**
+
+With the plan's code the gradient was static: two frames 13 seconds apart were
+pixel-identical. `MeshGradient` takes `SIMD2<Float>`, so the plan converted the
+time to `Float` first — but the time fed in is
+`timeIntervalSinceReferenceDate`, currently about 8.09x10^8, and a `Float`'s
+ulp at that magnitude is **64 seconds**. Every timestamp inside a 64-second
+window collapses to the same value, so the animation froze for a minute at a
+time and then jumped.
+
+Verified directly rather than by eye: `Float(now).ulp` prints `64.0`, and
+`sin(Float(now + delta) * 0.17)` returns an identical result for delta of 0, 1,
+5, and 13 seconds.
+
+`MeshPoints` now keeps all phase arithmetic in `Double` and narrows only the
+final position to `Float`. Same public signature, so no call site changed.
+
+
 ---
 
 ### Task 6: Glass glyphs — spike, then implement
@@ -695,6 +729,31 @@ Restore `ThemeCatalog.default` to `all[0]`.
 git add real-time/Foreground/GlassClockText.swift real-time/Clock/ClockFace.swift real-time/Models/ThemeCatalog.swift docs/superpowers/plans/2026-08-24-tvos-clock.md
 git commit -m "feat: add liquid-glass clock glyphs with reduce-transparency fallback"
 ```
+
+**Outcome — Strategy A (masked glass layer) was used.**
+
+Screenshot: `/private/tmp/.../scratchpad/glass-strategy-a-a.png`, taken on
+Aurora with the mesh animating.
+
+Strategies B (`.foregroundStyle(.ultraThinMaterial)`) and C (white at 0.35
+opacity with `.blendMode(.overlay)`) were never reached: A passed on its first
+build, and the plan says to stop at the first strategy that passes.
+
+What A produces: the glyph interiors show the mesh directly — the digits over
+the green region read teal, the ones over the violet region read purple, and
+the colors travel through the glyphs as the mesh moves. Not flat white, not
+invisible, not a solid slab of glass.
+
+The one reservation, reported rather than asserted away: contrast is low. The
+glyphs are legible but faint, and that is inherent to `.clear` glass over a
+mid-tone gradient. If it reads as too faint on a real panel, the knobs are
+`.glassEffect(.regular, …)` instead of `.clear`, or a soft drop shadow behind
+the mask.
+
+The implementation was split into `GlassClockText` (which chooses between glass
+and the Reduce Transparency fallback) and `GlassGlyphLayer` (which does the
+masking), to stay inside the project's 30-line view limit.
+
 
 ---
 
@@ -899,6 +958,31 @@ git add real-time/Settings/ real-time/Clock/ClockScreen.swift
 git commit -m "feat: add auto-hiding settings overlay and theme selection grid"
 ```
 
+**Design change after the plan — the bar is permanent, and it is glass.**
+
+Requested after implementation: the control bar no longer auto-hides, and its
+background is `.glassEffect(.regular, in: .capsule)` inside a
+`GlassEffectContainer` rather than `.thinMaterial`.
+
+Consequences:
+
+- `OverlayRevealModifier` and `OverlayReveal` were **deleted**, not left
+  unused: with the bar permanent there is nothing to reveal, no 5s countdown,
+  and no `revealCount`. `ClockScreen` lost its `@State`, its `.focusable()`,
+  its `.onMoveCommand` / `.onPlayPauseCommand` / `.onExitCommand`, and its
+  `.task(id:)`, and is now a plain three-layer `ZStack`.
+- Focus no longer needs the screen itself to be focusable — the bar's buttons
+  are always on screen, so tvOS gives one of them initial focus.
+- The spec's "auto-hiding settings entry" requirement is superseded by this
+  change.
+
+Known cosmetic consequence, not yet addressed: on a solid theme the
+"Solid themes have nothing to flow" caption is now on screen permanently, and
+because it sits in a `VStack` under the Animation button it makes that button
+sit higher than its two neighbours. Previously this only showed for the five
+seconds the bar was up.
+
+
 ---
 
 ### Task 8: Searchable timezone picker
@@ -1054,6 +1138,319 @@ Expected: `** BUILD SUCCEEDED **` and the clock renders as before. The screensav
 git add real-time/Support/IdleTimerModifier.swift real-time/Clock/ClockScreen.swift
 git commit -m "feat: prevent tvOS screensaver while the clock is visible"
 ```
+
+**Later revisions — compact icon bar, pushed navigation, faster motion.**
+
+Requested after the always-visible change:
+
+- The bar is now icon-only for Theme (`paintpalette`) and Timezone (`globe`),
+  via `Label` + `.labelStyle(.iconOnly)` so the text survives as the
+  accessibility label. Only the animation control keeps visible text, because
+  its label is the state readout. `Metrics.Overlay` shrank accordingly
+  (paddings 48/24 to 20/10, spacing 32 to 12).
+- The "Solid themes have nothing to flow" caption was **removed**. Written for
+  a bar that appeared for five seconds, it became the largest element in a bar
+  that is now permanent and deliberately small. `Metrics.Overlay.captionSpacing`
+  was deleted with it. The disabled appearance carries the meaning alone.
+- `ThemeGrid` and `TimeZonePicker` are now **pushed** in a `NavigationStack`
+  rather than presented with `.fullScreenCover`, so they are their own screens
+  instead of covers layered over the clock. Their `@Environment(\.dismiss)`
+  calls needed no change — `dismiss()` pops a push just as it dismisses a
+  cover. `SettingsOverlay` lost both `@State` flags in the process.
+- `MeshPoints` gained a `speed` multiplier (5.0) and its amplitude went 0.08 to
+  0.18. At the original values each point cycled every 18-37 seconds, which
+  read as nearly static; now it is 4-7 seconds. Amplitude is safe to raise
+  because `freedom` pins the boundary, so no value opens a gap at the screen
+  edge. These two constants are the speed and distance knobs.
+
+
+**Later revision — themes are grouped into categories.**
+
+The catalog went from 6 flat themes to 22 themes in 5 categories: Basics,
+Night, Happiness, Calm, Storm. New types: `ThemeCategory` (id, name, a
+three-stop `segment` gradient for its picker segment, and its themes) and
+`Color(hex:)`. `ThemeProviding` now exposes `categories` instead of `all`, and
+`AppSettingsProviding.availableThemes` became `themeCategories`.
+
+`ThemeGrid` is now a category segment row above the tiles for the selected
+category, split into `ThemeCategoryPicker`, `ThemeCategorySegment` and
+`ThemeTileGrid` to stay inside the 30-line view limit. It opens on whichever
+category holds the current theme rather than always on the first.
+
+Notes on the palette:
+
+- Ember, Ocean, Aurora and Dusk were removed, superseded by the new system.
+  Midnight and Paper survive as `Basics` — the only solid backgrounds, and
+  Midnight is still the default and the lowest power draw on OLED.
+- `mesh` gained a four-stop overload for Rainbow. It lays the stops along the
+  diagonal instead of rotating them, because rotation would place the first and
+  last stop side by side, which is exactly the harsh spectral jump a four-stop
+  palette exists to avoid. The cost is repeating the last stop at the ninth
+  point.
+- Only Night's `Aurora` uses the glass foreground. Glass was tried on Rainbow
+  too and removed: that palette runs light through its upper half, and glass
+  glyphs over a light field are illegible. Every other theme is
+  `.solid(.white)`, which the Calm set confirmed is legible even over Snow's
+  bright ceiling.
+- The `Basics` segment gradient and the shortening of "Energy / Storm" to
+  "Storm" were both implementation choices, not specified.
+
+
+**Later revision — sections replace the category picker.**
+
+The segmented category picker was dropped for one continuous scroll with a
+titled section per category. `ThemeCategoryPicker` and `ThemeCategorySegment`
+were deleted; `ThemeSection` (title plus tiles, no divider and no artwork) was
+added. `ThemeGrid` is now a `LazyVStack` of sections inside a `ScrollView`,
+lazy so twenty-two live previews are not all built on first appearance.
+
+`ThemeCategory.segment` was removed with the picker, along with the
+`segment(_:)` helper in the catalog and the five `category*` values in
+`Metrics.Grid`. The three-stop segment gradients supplied for each category
+therefore no longer appear anywhere in the app. Tinting the section titles with
+them was considered and rejected: Night and Calm both start near-black, so
+gradient-filled text would be unreadable on a dark background.
+
+Sections are plain `VStack`s, never `DisclosureGroup`, because they must not
+collapse.
+
+
+**Later revision — vivid tier added, near-duplicates removed.**
+
+The catalog is now 35 themes in 9 sections: Basics, then each of the four
+moods followed by its vivid counterpart. Vivid variants are separate sections
+rather than merged into their muted counterparts, because the difference is a
+deliberate choice, not a variation.
+
+Similarity was measured rather than eyeballed: each gradient was sampled at 9
+points, converted to CIE Lab, and compared pairwise as mean dE76. Below 10
+counts as a near-duplicate.
+
+Removed from the existing set:
+
+| Theme | dE | Nearest |
+|---|---|---|
+| Misty dawn | 3.7 | Rain on window |
+| Rain on window | 4.4 | Fog |
+| Sunshine | 8.1 | Sunflower |
+| Rapids | 10.6 | Waves |
+
+`Misty dawn`, `Fog` and `Rain on window` were effectively one gradient three
+times; `Fog` was kept because its neutrality sits furthest from `Snow`.
+
+Skipped from the new set:
+
+| Theme | dE | Nearest | Why this one |
+|---|---|---|---|
+| Cyber aurora | 9.7 | Menthol water | Vivid Night keeps a mint-green in Blacklight forest; Vivid Calm would have dropped to two themes |
+| Moon halo | 7.8 | Neon mist | Neon mist's violet adds hue variety to an otherwise all-cyan section |
+
+Minimum separation across the surviving 33 gradients rose from dE 3.7 to 10.2.
+
+`ThemeTileCaption` gained `.lineLimit(1)` and a minimum scale factor: "Deep-sea
+bioluminescence" would otherwise wrap and make its tile taller than the others
+in its row.
+
+**Open issue — white foreground contrast.** Measured white against each
+palette's brightest stop: 27 of 33 fall below the WCAG 3.0:1 floor for large
+text, worst at Neon meadow (1.11:1 against `#E8FF5C`). This is pre-existing and
+not specific to the vivid tier — Sunflower (1.59:1) and Snow (1.59:1) were
+already there. It is a worst case rather than the typical one, since the
+brightest region of an animated mesh is usually not under the digits. The
+standard fix is a soft dark shadow behind the glyphs, which costs nothing on
+dark palettes and rescues the bright ones; not applied, because it changes the
+look of every theme and that is a design decision.
+
+
+**Later revision — clock colour became a preference, not a theme property.**
+
+The theme list gained a first section, "Clock color", with four options:
+`Match theme`, `Light`, `Dark`, `Liquid glass`. New `ClockColor` enum in
+`Models/Settings/`, persisted as a fourth `UserDefaults` key and resolved
+against the active theme by `AppSettings.clockForeground`.
+
+This replaces per-theme glass. `Night/Aurora` no longer hardcodes
+`foreground: .glass` — no theme does. `Theme.foreground` is now read only by
+`ClockColor.matchTheme`, and glass is reachable only when the viewer asks for
+it. `ClockFace` takes a `ForegroundStyle` instead of a whole `Theme`.
+
+Measurement that prompted the change: glass lightens the glyphs, so it needs a
+dark field. Ranking all 33 palettes by mean luminance, only `Starry night`
+(0.017) and `Forest` (0.035) are dark enough for `.clear` glass to read —
+`Aurora`, the one theme that had it, scores 0.179. Glass as a per-theme
+property was therefore wrong on almost every palette it could have been
+applied to; as a preference the viewer owns the tradeoff.
+
+Theme tiles now preview with the chosen clock colour rather than the theme's
+own, so a tile cannot promise something the clock will not deliver.
+
+**Open issue — `Light` is the default and `Paper` has a light background.**
+White on `#F0F0F0` is about 1.06:1, so out of the box the clock is invisible on
+`Paper`. Defaulting to `.matchTheme` instead would fix it while still rendering
+white on all 34 other themes, since every one of them ships a white foreground.
+Left as specified pending a decision.
+
+
+**Later revision — vivid palettes merged into their mood sections.**
+
+The four `Vivid *` sections were folded into the mood they belong to, so the
+list is five sections again: Basics (2), Night (9), Happiness (9), Calm (6),
+Storm (9) — 35 themes, none lost. Within a section the muted palettes come
+first and the vivid ones follow, so each section reads quiet to loud.
+
+Theme IDs were unchanged by the merge, so no persisted selection was
+invalidated. Verified: 35 ids, all unique.
+
+`Deep-sea bioluminescence` renamed to `Deep sea`. Its id stays `deep-sea`, so
+this is a display-only change and nothing persisted needs migrating. The
+one-line caption clamp added for the old long name is kept — it protects any
+future long name, not just that one.
+
+
+**Later revision — clock colour reduced to three options; themes lost their
+foreground.**
+
+`Match theme` was dropped, leaving `White`, `Black` and `Liquid glass`. Since
+every theme shipped a white foreground, `Match theme` duplicated `White` on 34
+of 35 themes and only diverged on `Paper`.
+
+That removal made two types dead, so both went with it:
+
+- `Theme.foreground` — nothing read it once `ClockColor.matchTheme` was gone.
+  `Theme` is now id, name and background.
+- `ForegroundStyle` — **deleted**. With three fixed options mapping to white,
+  black and glass, an intermediate style vocabulary added indirection without
+  expressive power. `ClockTimeText` and `ThemeTilePreviewText` now switch on
+  `ClockColor` directly, and `AppSettings.clockForeground` is gone.
+
+Persistence: `glass` keeps its raw value so an existing selection survives. A
+stored `light` or `dark` from the four-option version no longer maps and falls
+back to `.white`, the same graceful path an unknown theme ID takes.
+
+**Consequence for `Paper`.** It is the only light background, and with no
+per-theme foreground there is no way for it to specify dark digits. Anyone
+choosing `Paper` must also choose `Black`, or the clock is invisible
+(white on `#F0F0F0` is about 1.06:1). This is now structural rather than a
+default-value question: the alternatives are dropping `Paper`, or reintroducing
+a per-theme override for it alone.
+
+
+**Later revision — colours now travel across the mesh (lava-lamp motion).**
+
+Symptom: each colour stayed in its own corner and rocked back and forth.
+
+Cause, and why more point motion could not fix it: colours were welded to
+control points, and the mesh boundary is pinned so the gradient fills the
+screen. Every point therefore stays near where it started, so a colour bound to
+one can only oscillate in place. The colours themselves had to move.
+
+Two changes:
+
+- **`MeshColors`** (new). `BackgroundStyle.mesh` now stores the palette's three
+  or four *stops* rather than nine pre-expanded colours, and the nine
+  control-point colours are derived per frame. Each point samples the palette at
+  `row + column + drift`, so colour bands sweep the diagonal and travel corner
+  to corner over `lapDuration` (26s). Sampling is fractional and blended with
+  `Color.mix(with:by:)`, so the drift is continuous rather than stepped.
+  The palette is mirrored into a ring first — three stops become a-b-c-b —
+  because cycling a-b-c directly would butt the last stop against the first
+  once per lap, the exact harsh jump a hand-ordered palette exists to avoid.
+  This also replaced the old rotation/diagonal expansion in `ThemeCatalog`,
+  which is now just `Theme(id:name:background:)`.
+
+- **`MeshPoints.wander`**. Each axis is a base sine plus a second harmonic at
+  0.37 of its frequency, weighted 0.45. A single sine traces the same straight
+  line forever and reads as a pendulum; two detuned sines make the path wander
+  and never quite retrace itself. Weights sum to 1 so travel stays inside
+  `amplitude` and the boundary stays pinned.
+
+Verified on frames 22 seconds apart: deep purple moved from the right half to
+the top-left corner, where previously regions only brightened and dimmed in
+place.
+
+
+**Correction to the previous revision — colours must not blend over time.**
+
+The drift added above was the wrong mechanism. Sampling the palette at
+`row + column + drift` made each point's colour slide continuously from one
+stop to the next, so colours faded out and others faded in, and at any instant
+some stop was absent from the screen entirely.
+
+`MeshColors` is now **time-invariant**: each point is welded to one exact stop
+at an integer ring position, so no blending occurs and every stop is on screen
+permanently. `lapDuration` is gone. What changes is where the points are, and
+therefore how much of the screen each colour covers.
+
+To make that movement large enough to read as travel, `defaultAmplitude` went
+0.18 to **0.34** and `speed` 5.0 to **3.0**. Large amplitudes are safe here
+because `freedom` keeps each point on its own edge or in the interior, so row
+and column order is preserved and the mesh cannot fold: an edge point sweeps
+0.16 to 0.84 along its edge, and the centre roams that range in both axes
+without reaching an edge. Velocity is roughly unchanged; the ground covered is
+nearly doubled.
+
+The mirrored ring is kept, now for a spatial rather than temporal reason: it
+stops the diagonal wrapping the last stop back onto the first. A 3x3 diagonal
+spans five bands, so every stop lands on at least one point — `a b c b a` for
+three stops, `a b c d c` for four.
+
+Verified on frames 22 seconds apart with the four-stop Synthwave horizon: all
+four stops present in both, with the dark purple growing from a small corner to
+a full quadrant and the orange expanding up the right side.
+
+
+**Later revision — the mesh is drawn oversized and swept, so colours cross the
+whole view.**
+
+Colours still sat in their corners. This is geometric, not a tuning problem: a
+pinned boundary is what guarantees the gradient covers the screen, and it
+therefore nails the corner colours in place. While the mesh edge *is* the screen
+edge, no per-point motion can carry a colour from one side of the view to the
+other.
+
+`MeshDrift` (new): the mesh is drawn `overscan` (1.9x) larger than the view and
+its centre is swept around on a slow detuned Lissajous path, up to `travel`
+(0.40) of the view in each axis. The pinned boundary is then always off-screen,
+and every colour crosses the whole visible area. The invariant to preserve is
+`travel < (overscan - 1) / 2`, or the pinned edge slides into view as a hard
+border.
+
+`MeshPoints` went from 3x3 to **5x5** (25 colors, so `MeshColors` returns 25).
+The view now shows only part of the mesh, and a 3x3 diagonal spans just five
+bands — a window over half the mesh could not hold every stop. At 5x5 the bands
+repeat, so every colour stays on screen wherever the mesh has drifted. Its
+frequency and phase tables were replaced by golden-ratio stepping from the point
+index, which spreads 50 values without a stored table and scales with
+`gridSize`. `defaultAmplitude` dropped 0.34 to 0.09, since points are now
+0.25 apart and crossing a neighbour folds the mesh; the global sweep, not local
+churn, is what moves colour across the view now.
+
+`AnimatedMeshBackground` is split: it owns the timeline and geometry, and the
+new `SweptMesh` owns the oversized frame and `position`. `position` rather than
+`offset` because `GeometryReader` anchors children top-leading, so an offset
+alone would not centre the oversized mesh.
+
+Verified on frames 26 seconds apart: orange moved from the top-left corner to
+spanning the whole top band, and the dark stop from a centre-left band to the
+right side — with all four stops present throughout.
+
+
+**Later revision — the drift was slowed by half again.**
+
+`MeshDrift`'s frequencies are now expressed as **periods in seconds** rather
+than radians per second, so the pace can be retuned by eye without doing the
+2*pi arithmetic. 120s horizontal and 165s vertical, up from roughly 80s and
+110s. The detuning ratio was kept close to the original so the two axes still
+never resynchronise into a straight diagonal.
+
+`MeshPoints.speed` went 3.0 to 2.0 at the same time, so the local churn stays in
+proportion to the sweep instead of becoming the busier of the two.
+
+Verified on frames 31 seconds apart with Electric rainbow: the mint stop
+retreated to a sliver at the top-left, yellow crossed the top, and the dark stop
+grew into a large blob on the right — clearly still travelling, but evolving
+rather than sweeping.
+
 
 ---
 
