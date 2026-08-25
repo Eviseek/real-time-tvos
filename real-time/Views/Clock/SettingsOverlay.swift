@@ -6,6 +6,8 @@ struct SettingsOverlay: View {
     /// Whichever control holds focus — the signal `hidesWhenIdle` reads.
     private enum Control: Hashable { case theme, timezone, animation }
 
+    @Environment(\.settings) private var settings
+
     @FocusState private var focusedControl: Control?
 
     /// How long the bar stays up after the last interaction before it fades.
@@ -18,7 +20,7 @@ struct SettingsOverlay: View {
                     .focused($focusedControl, equals: .theme)
                 NavigationLink("Timezone") { TimeZonePicker() }
                     .focused($focusedControl, equals: .timezone)
-                AnimationToggleButton()
+                animationToggle
                     .focused($focusedControl, equals: .animation)
             }
             .font(.system(size: Metrics.Overlay.labelFontSize))
@@ -29,5 +31,13 @@ struct SettingsOverlay: View {
         .padding(.top, Metrics.Overlay.topPadding)
         .frame(maxHeight: .infinity, alignment: .top)
         .hidesWhenIdle(after: Self.hideDelay, resetting: focusedControl)
+    }
+
+    /// Disabled for the solid themes, which have nothing to animate.
+    private var animationToggle: some View {
+        Button(settings.isAnimated ? "Animation: On" : "Animation: Off") {
+            settings.isAnimated.toggle()
+        }
+        .disabled(!settings.theme.background.isMesh)
     }
 }
