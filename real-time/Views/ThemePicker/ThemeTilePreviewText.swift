@@ -11,10 +11,13 @@ struct ThemeTilePreviewText: View {
 
     var body: some View {
         switch color {
-        case .white: solid(.white)
-        case .black: solid(.black)
-        case .glass: GlassClockText(text: Self.sample,
-                                    fontSize: Metrics.ThemeTile.previewFontSize)
+        case .white:
+            solid(.white)
+        case .black:
+            solid(.black)
+        case .glass:
+            GlassClockText(text: Self.sample,
+                            fontSize: Metrics.ThemeTile.previewFontSize)
         }
     }
 

@@ -12,9 +12,12 @@ struct ClockTimeText: View {
 
     var body: some View {
         switch color {
-        case .white: solid(.white)
-        case .black: solid(.black)
-        case .glass: GlassClockText(text: text, fontSize: Metrics.Clock.timeFontSize)
+        case .white:
+            solid(.white)
+        case .black:
+            solid(.black)
+        case .glass:
+            GlassClockText(text: text, fontSize: Metrics.Clock.timeFontSize)
         }
     }
 

@@ -77,6 +77,21 @@ line that names the theme it belongs to, so `mesh("forest", "Forest",
 separately named constants would add a layer of indirection without adding
 information.
 
+## Switch statements
+
+Every `case`'s implementation goes on its own new line, never after the colon
+on the `case` line — including single-expression bodies used as an implicit
+return.
+
+```swift
+// Not this:
+case .white: "White"
+
+// This:
+case .white:
+    "White"
+```
+
 ## Views are at most 30 lines
 
 A view file's `struct` declaration is at most 30 lines, braces included. Past

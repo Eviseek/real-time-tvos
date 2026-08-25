@@ -17,9 +17,12 @@ enum ClockColor: String, CaseIterable, Identifiable, Sendable {
 
     var name: String {
         switch self {
-        case .white: "White"
-        case .black: "Black"
-        case .glass: "Liquid glass"
+        case .white:
+            "White"
+        case .black:
+            "Black"
+        case .glass:
+            "Liquid glass"
         }
     }
 
@@ -27,8 +30,10 @@ enum ClockColor: String, CaseIterable, Identifiable, Sendable {
     /// own to lend, so the label falls back to white.
     var secondaryColor: Color {
         switch self {
-        case .white, .glass: .white
-        case .black: .black
+        case .white, .glass:
+            .white
+        case .black:
+            .black
         }
     }
 }
