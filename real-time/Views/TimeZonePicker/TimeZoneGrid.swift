@@ -20,7 +20,9 @@ struct TimeZoneGrid: View {
         // tvOS focus engine on first appearance.
         LazyVGrid(columns: columns, spacing: Metrics.Grid.zoneSpacing) {
             ForEach(options) { option in
-                Button { select(option) } label: {
+                Button {
+                    select(option)
+                } label: {
                     TimeZoneRow(option: option, isSelected: option.id == settings.timeZoneID)
                 }
                 .buttonStyle(.card)

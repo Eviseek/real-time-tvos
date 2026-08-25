@@ -13,7 +13,9 @@ struct ThemeTileGrid: View {
     var body: some View {
         LazyVGrid(columns: columns, spacing: Metrics.Grid.themeSpacing) {
             ForEach(themes) { theme in
-                Button { select(theme) } label: {
+                Button {
+                    select(theme)
+                } label: {
                     ThemeTile(theme: theme, isSelected: theme.id == settings.themeID)
                 }
                 // Apple's standard tvOS tile treatment.

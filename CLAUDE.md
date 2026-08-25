@@ -92,6 +92,30 @@ case .white:
     "White"
 ```
 
+## Buttons
+
+A `Button`'s action and its label each start on their own line. An action is
+never squeezed onto the `Button` line ahead of `label:`.
+
+```swift
+// Not this:
+Button { select(theme) } label: {
+    ThemeTile(theme: theme)
+}
+
+// This:
+Button {
+    select(theme)
+} label: {
+    ThemeTile(theme: theme)
+}
+```
+
+The action is the part that changes state — the whole reason the button
+exists. It reads at the same indent as the label it is attached to, not
+trailing off the end of a line where the eye skips it. The same holds for the
+`Button("Title") { … }` form: the action goes on the line below.
+
 ## Views are at most 30 lines
 
 A view file's `struct` declaration is at most 30 lines, braces included. Past

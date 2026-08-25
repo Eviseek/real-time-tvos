@@ -16,7 +16,9 @@ struct ClockColorSection: View {
                 ForEach(ClockColor.allCases) { option in
                     // Deliberately does not dismiss: you pick a colour and
                     // keep scrolling to try it against different palettes.
-                    Button { settings.clockColor = option } label: {
+                    Button {
+                        settings.clockColor = option
+                    } label: {
                         ClockColorTile(option: option,
                                        theme: settings.theme,
                                        isSelected: option == settings.clockColor)
