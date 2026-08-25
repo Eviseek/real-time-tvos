@@ -64,6 +64,7 @@ nonisolated struct ThemeCatalog: ThemeProviding {
             mesh("street-lights", "Street lights", 0x141220, 0x382E48, 0xD98A45),
             mesh("forest", "Forest", 0x0E1512, 0x17302B, 0x2C5449),
             mesh("moonlit-lake", "Moonlit lake", 0x101A2C, 0x2C4A6E, 0x8FA8BE),
+            mesh("pine-frost", "Pine frost", 0x0B0909, 0x2E4540, 0x408175, 0xB5B9F0),
 
             // Vivid: the same mood at high chroma. Ordered after the muted
             // palettes so each section reads quiet to loud.
@@ -72,6 +73,30 @@ nonisolated struct ThemeCatalog: ThemeProviding {
                  0x12061F, 0x8B1FA8, 0xFF5FA2, 0xFFB35C),
             mesh("blacklight-forest", "Blacklight forest", 0x060E0C, 0x1FBF6E, 0x6BFF9E),
             mesh("deep-sea", "Deep sea", 0x04101F, 0x0F6ED9, 0x35E5FF),
+            mesh("blue-hour", "Blue hour", 0x091540, 0x1B2CC1, 0x7692FF, 0xABD2FA),
+            mesh("nebula", "Nebula", 0x443199, 0x792CA2, 0xC13383, 0xE05454),
+            mesh("orchid-night", "Orchid night", 0x15173D, 0x982598, 0xE491C9, 0xF1E9E9),
+            mesh("ultraviolet", "Ultraviolet", 0x0E21A0, 0x4D2FB2, 0xB153D7, 0xF375C2),
+            mesh("supernova", "Supernova", 0x1A05A2, 0x8F0177, 0xDE1A58, 0xF67D31),
+            mesh("garnet", "Garnet", 0x111F35, 0x8A244B, 0xD02752, 0xF63049),
+        ]
+    )
+
+    /// The palettes with no dark stop: every one of them lights the room
+    /// rather than sitting behind the clock in it. They are a category and not
+    /// a section because the choice they ask of the viewer is a different one
+    /// — a light background wants a dark `ClockColor`, where every other
+    /// palette here is legible under the white default.
+    private static let daylight = ThemeCategory(
+        id: "daylight",
+        name: "Daylight",
+        themes: [
+            mesh("wisteria", "Wisteria", 0x9B8EC7, 0xBDA6CE, 0xB4D3D9, 0xF2EAE0),
+            mesh("periwinkle", "Periwinkle", 0x6367FF, 0x8494FF, 0xC9BEFF, 0xFFDBFD),
+            mesh("sorbet", "Sorbet", 0xB95E82, 0xF39F9F, 0xFFC29B, 0xFFECC0),
+            mesh("bubblegum", "Bubblegum", 0xD6336C, 0xFF4081, 0xFFB6C1, 0xFFF5F8),
+            mesh("mango", "Mango", 0xFA5C5C, 0xFD8A6B, 0xFEC288, 0xFBEF76),
+            mesh("bonfire", "Bonfire", 0xE73F1E, 0xFB6C00, 0xF9B637, 0xFFDD9C),
         ]
     )
 
@@ -92,6 +117,8 @@ nonisolated struct ThemeCatalog: ThemeProviding {
             mesh("candy-sunset", "Candy sunset", 0x2A0E2A, 0xFF4D8F, 0xFFA85C),
             mesh("confetti-burst", "Confetti burst",
                  0x160C2E, 0xFF3D6E, 0x3DD9FF, 0xFFE03D),
+            mesh("desert-dusk", "Desert dusk", 0x5E244E, 0xAA1C41, 0xE68457, 0xFFE8B4),
+            mesh("kite-festival", "Kite festival", 0xFF5B5B, 0xF0FFC3, 0x9CCFFF, 0x685AFF),
         ]
     )
 
@@ -105,11 +132,15 @@ nonisolated struct ThemeCatalog: ThemeProviding {
             mesh("zen-garden", "Zen garden", 0x1E1C18, 0x4A4436, 0x9C9078),
             mesh("fog", "Fog", 0x1C2124, 0x454F55, 0x8A979E),
             mesh("snow", "Snow", 0x20262E, 0x4E5D6B, 0xC3CFD8),
+            mesh("heather", "Heather", 0x403D88, 0x8B639B, 0xAF719D, 0xF8B2B2),
+            mesh("sea-glass", "Sea glass", 0x4A4466, 0x6EADBC, 0x9FCBAD, 0xF1F7D4),
+            mesh("olive-grove", "Olive grove", 0x41431B, 0xAEB784, 0xE3DBBB, 0xF8F3E1),
 
             // Vivid
             mesh("ice-glow", "Ice glow", 0x0A1620, 0x2E9ED9, 0x7FE8FF),
             mesh("neon-mist", "Neon mist", 0x12141F, 0x5C6BD9, 0xA8B5FF),
             mesh("menthol-water", "Menthol water", 0x08201C, 0x1FC4A8, 0x6BFFE0),
+            mesh("jade", "Jade", 0x1F6F5F, 0x2FA084, 0x6FCF97, 0xEEEEEE),
         ]
     )
 
@@ -128,10 +159,13 @@ nonisolated struct ThemeCatalog: ThemeProviding {
             mesh("plasma-waves", "Plasma waves", 0x04161F, 0x0F9ED9, 0x3DFFE0),
             mesh("voltage", "Voltage", 0x0E0A1F, 0xB82EFF, 0xFF2E6B),
             mesh("redline", "Redline", 0x1A0410, 0xFF1F5C, 0xFF9E3D),
+            mesh("firewatch", "Firewatch", 0x003049, 0xD62828, 0xF77F00, 0xFCBF49),
+            mesh("ember", "Ember", 0x5E0006, 0x9B0F06, 0xD53E0F, 0xEED9B9),
+            mesh("live-wire", "Live wire", 0x362F4F, 0x5B23FF, 0x008BFF, 0xE4FF30),
         ]
     )
 
     private static let allCategories: [ThemeCategory] = [
-        basics, night, happiness, calm, storm,
+        basics, night, daylight, happiness, calm, storm,
     ]
 }
