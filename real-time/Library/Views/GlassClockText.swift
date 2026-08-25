@@ -15,7 +15,7 @@ struct GlassClockText: View {
                 .clockDigitFont(size: fontSize)
                 .foregroundStyle(.white)
         } else {
-            GlassGlyphLayer(text: text, fontSize: fontSize)
+            LiquidGlassText(text: text, fontSize: fontSize)
         }
     }
 }
