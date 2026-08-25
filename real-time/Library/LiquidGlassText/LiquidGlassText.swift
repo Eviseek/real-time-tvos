@@ -15,5 +15,12 @@ struct LiquidGlassText: View {
         Color.clear
             .glassEffect(.clear, in: glyphs.path)
             .frame(width: glyphs.size.width, height: glyphs.size.height)
+            // Without these the view has no baseline of its own, so a
+            // baseline-aligned stack falls back to its bottom edge — the
+            // descender line, which sits further below the glyphs the larger
+            // the font is. Two glass strings at different sizes would then
+            // disagree about which line they stand on.
+            .alignmentGuide(.firstTextBaseline) { _ in glyphs.baseline }
+            .alignmentGuide(.lastTextBaseline) { _ in glyphs.baseline }
     }
 }

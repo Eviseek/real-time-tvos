@@ -9,13 +9,17 @@ import CoreText
 struct TextHelper {
     private init() {}
 
+    /// Returns the baseline's offset from the top of that frame alongside it:
+    /// the view built from this has no text of its own, so it has no baseline
+    /// to offer a baseline-aligned stack unless it is handed this one.
+    ///
     /// The frame is measured from the font's typographic metrics, never from
     /// the path's own ink bounds: ink bounds are tight to whichever glyphs
     /// happen to be on screen, and digits vary — a "1" sits further from the
     /// frame edge than an "8" even though `.monospacedDigit()` gives them the
     /// same advance width. Sizing to ink would resize (and visibly shift) the
     /// glass shape on every tick; the typographic frame does not.
-    static func path(for text: String, font: UIFont) -> (path: Path, size: CGSize) {
+    static func path(for text: String, font: UIFont) -> (path: Path, size: CGSize, baseline: CGFloat) {
         let line = CTLineCreateWithAttributedString(NSAttributedString(string: text, attributes: [.font: font]))
         let runs = CTLineGetGlyphRuns(line) as! [CTRun]
 
@@ -48,6 +52,6 @@ struct TextHelper {
         // baseline at the same frame position for every tick.
         let flip = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: ascent)
         let size = CGSize(width: width, height: ascent + descent)
-        return (Path(outputPath).applying(flip), size)
+        return (Path(outputPath).applying(flip), size, ascent)
     }
 }
