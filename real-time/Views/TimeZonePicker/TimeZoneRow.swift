@@ -11,12 +11,10 @@ struct TimeZoneRow: View {
                 Image(systemName: "checkmark")
             }
             Text(option.display)
-                // Long identifiers must not reflow the grid's row heights.
                 .lineLimit(1)
         }
         .padding(.vertical, Metrics.Grid.zoneRowPadding)
         .padding(.leading, Metrics.Grid.zoneRowLeadingPadding)
-        // Fills the cell so the row stays left-aligned however short the name.
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
