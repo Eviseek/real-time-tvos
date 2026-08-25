@@ -28,6 +28,10 @@ private struct HidesWhenIdleModifier<Trigger: Equatable>: ViewModifier {
             .task(id: interactionCount) {
                 isVisible = true
                 try? await Task.sleep(for: delay)
+                // A new interaction cancels this task to start its own; without
+                // this check the cancelled sleep falls straight through to
+                // `isVisible = false` and races the new task's `= true`.
+                guard !Task.isCancelled else { return }
                 isVisible = false
             }
     }
