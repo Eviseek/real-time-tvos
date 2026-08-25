@@ -1,27 +1,42 @@
 import SwiftUI
 
-/// One theme in the selection grid, rendered as a live miniature of itself.
+/// One option in the theme list, drawn as a live miniature of itself: the
+/// palette behind, a sample time in front, the name below.
+///
+/// Serves both axes of the list. A palette tile and a clock-colour tile are
+/// the same picture — they differ only in which of the two the caption names,
+/// and in which one the caller is holding fixed.
 struct ThemeTile: View {
     let theme: Theme
+    let color: ClockColor
+    let name: String
     let isSelected: Bool
-
-    @Environment(\.settings) private var settings
 
     var body: some View {
         VStack(spacing: Metrics.ThemeTile.captionSpacing) {
             ZStack {
-                // Static preview: a grid of tiles each running its own 30fps
-                // timeline would cost more than the screen it is previewing.
                 BackgroundView(style: theme.background, isAnimating: false)
                     .clipShape(.rect(cornerRadius: Metrics.ThemeTile.previewCornerRadius))
-                // Drawn with the chosen clock colour, not the theme's own, so
-                // a tile cannot promise something the clock will not deliver.
-                ThemeTilePreviewText(color: settings.clockColor)
+                ThemeTilePreviewText(color: color)
             }
             .frame(height: Metrics.ThemeTile.previewHeight)
 
-            ThemeTileCaption(name: theme.name, isSelected: isSelected)
+            caption
                 .padding(.bottom, Metrics.ThemeTile.captionBottomPadding)
         }
+    }
+
+    /// The name, with a checkmark when this is the active option.
+    private var caption: some View {
+        HStack(spacing: Metrics.ThemeTile.captionItemSpacing) {
+            if isSelected {
+                Image(systemName: "checkmark.circle.fill")
+            }
+            Text(name)
+                .lineLimit(1)
+                .minimumScaleFactor(Metrics.ThemeTile.captionMinimumScale)
+                .padding(.horizontal, Metrics.Grid.zoneRowPadding)
+        }
+        .font(.callout)
     }
 }

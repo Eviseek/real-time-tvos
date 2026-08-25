@@ -16,7 +16,10 @@ struct ThemeTileGrid: View {
                 Button {
                     select(theme)
                 } label: {
-                    ThemeTile(theme: theme, isSelected: theme.id == settings.themeID)
+                    ThemeTile(theme: theme,
+                              color: settings.clockColor,
+                              name: theme.name,
+                              isSelected: theme.id == settings.themeID)
                 }
                 // Apple's standard tvOS tile treatment.
                 .buttonStyle(.card)

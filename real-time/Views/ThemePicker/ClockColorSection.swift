@@ -10,21 +10,32 @@ struct ClockColorSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Metrics.Grid.sectionTitleSpacing) {
-            Text("Clock color")
-                .font(.system(size: Metrics.Grid.sectionTitleFontSize, weight: .semibold))
-            LazyVGrid(columns: columns, spacing: Metrics.Grid.themeSpacing) {
-                ForEach(ClockColor.allCases) { option in
-                    // Deliberately does not dismiss: you pick a colour and
-                    // keep scrolling to try it against different palettes.
-                    Button {
-                        settings.clockColor = option
-                    } label: {
-                        ClockColorTile(option: option,
-                                       theme: settings.theme,
-                                       isSelected: option == settings.clockColor)
-                    }
-                    .buttonStyle(.card)
+            title
+            content
+        }
+    }
+    
+    private var title: some View {
+        Text("Clock color")
+            .font(.system(size: Metrics.Grid.sectionTitleFontSize, weight: .semibold))
+    }
+    
+    private var content: some View {
+        LazyVGrid(columns: columns, spacing: Metrics.Grid.themeSpacing) {
+            ForEach(ClockColor.allCases) { option in
+                // Deliberately does not dismiss: you pick a colour and
+                // keep scrolling to try it against different palettes.
+                Button {
+                    settings.clockColor = option
+                } label: {
+                    // Previewed over the theme that is currently active,
+                    // so the choice is judged where it will be used.
+                    ThemeTile(theme: settings.theme,
+                              color: option,
+                              name: option.name,
+                              isSelected: option == settings.clockColor)
                 }
+                .buttonStyle(.card)
             }
         }
     }
