@@ -26,8 +26,11 @@ enum ClockColor: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    /// Colour for text that is not the time itself. Glass has no colour of its
-    /// own to lend, so the label falls back to white.
+    /// Colour for text that is not the time itself — the timezone label.
+    ///
+    /// Glass never asks for this: it draws that label as glass too, so it has
+    /// nothing to lend. The case stays only to keep the switch exhaustive, and
+    /// white is the safe answer if anything else ever reads it.
     var secondaryColor: Color {
         switch self {
         case .white, .glass:

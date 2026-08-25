@@ -20,9 +20,22 @@ struct ClockFace: View {
     }
 
     /// The city name beneath the time, so a non-local zone is never ambiguous.
-    private var zoneLabel: some View {
-        Text(ClockFormatter.cityName(for: timeZone))
-            .font(.system(size: Metrics.Clock.zoneFontSize, weight: .medium, design: .rounded))
-            .foregroundStyle(color.secondaryColor.opacity(Metrics.Clock.zoneOpacity))
+    ///
+    /// Drawn as glass when the clock is, so the label and the digits above it
+    /// do not disagree about what they are made of.
+    @ViewBuilder private var zoneLabel: some View {
+        switch color {
+        case .glass:
+            GlassClockText(text: cityName, fontSize: Metrics.Clock.zoneFontSize)
+                .opacity(Metrics.Clock.zoneOpacity)
+        case .white, .black:
+            Text(cityName)
+                .font(.system(size: Metrics.Clock.zoneFontSize, weight: .medium, design: .rounded))
+                .foregroundStyle(color.secondaryColor.opacity(Metrics.Clock.zoneOpacity))
+        }
+    }
+
+    private var cityName: String {
+        ClockFormatter.cityName(for: timeZone)
     }
 }
