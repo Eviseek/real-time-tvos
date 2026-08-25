@@ -116,12 +116,28 @@ exists. It reads at the same indent as the label it is attached to, not
 trailing off the end of a line where the eye skips it. The same holds for the
 `Button("Title") { … }` form: the action goes on the line below.
 
-## Views are at most 30 lines
+## A view body is at most 30 lines
 
-A view file's `struct` declaration is at most 30 lines, braces included. Past
-that, extract a subview into its own file rather than adding a computed
-property. This is a hard limit, not a guideline: it is what keeps `body`
+The limit is per view-producing member, not per file: `body` is at most 30
+lines, braces included, and so is every `private var` or `private func` that
+returns a view. A struct may hold several of those and run well past 30 lines
+overall. This is a hard limit, not a guideline: it is what keeps a body
 readable at a glance.
+
+Past the limit, extract — and the extraction has two destinations:
+
+- A **private member in the same file**, when the piece has no caller but this
+  one. A child view that exists solely because its parent got long is not a
+  new concept, and giving it a file implies it is reusable when it is not.
+- **Its own file and its own `struct`**, when a second view uses it, when it
+  needs its own `@State` or `@FocusState`, or when its body would itself
+  exceed 30 lines.
+
+Prefer the private member. Reach for a new file when one of those three
+conditions actually holds, not by default. An `@Environment` read is not one
+of them: it moves into the parent along with the code. `@State` and
+`@FocusState` are, because their lifetime is tied to the view's identity in
+the tree.
 
 ## Access dependencies through protocols
 
