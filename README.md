@@ -3,6 +3,14 @@
 A full-screen clock for Apple TV. It shows the time in large digits that stay
 readable from across the room, and it is meant to stay on screen for hours.
 
+![The clock in a green theme with the settings bar showing](screenshots/clock-settings-bar.jpg)
+
+| Black digits, 12-hour time | Liquid glass digits |
+|---|---|
+| ![Black 12-hour clock on a blue gradient](screenshots/clock-black-12-hour.jpg) | ![Glass digits on a purple gradient](screenshots/clock-liquid-glass.jpg) |
+
+![Searchable grid of time zones](screenshots/timezone-picker.jpg)
+
 ## Features
 
 - **24-hour or 12-hour time.** The clock updates every second, and the 12-hour
